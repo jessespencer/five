@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-instrument);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --sheet-bg: #F2F2F2;
+  --handle: #C0C0C0;
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #ffffff;
+  --sheet-bg: #161616;
+  --handle: #444444;
+}
+
+html {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+  overflow: hidden;
+  height: 100dvh;
+}
+
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* Hide scrollbars but keep scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
