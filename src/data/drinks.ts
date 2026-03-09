@@ -21,7 +21,7 @@ export const drinks: Record<string, Drink> = {
     name: "Blue Lagoon",
     city: "Baker Island",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "A vivid blue cocktail as remote and striking as the Pacific atoll itself.",
     recipe: {
       ingredients: [
@@ -43,7 +43,7 @@ export const drinks: Record<string, Drink> = {
     name: "Pago Pago Cocktail",
     city: "Pago Pago",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "A tropical rum cocktail named after the Samoan capital, blending island fruits with aged rum.",
     recipe: {
       ingredients: [
@@ -66,7 +66,7 @@ export const drinks: Record<string, Drink> = {
     name: "Mai Tai",
     city: "Honolulu",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "The quintessential tiki cocktail, perfected on the beaches of Waikiki.",
     recipe: {
       ingredients: [
@@ -91,7 +91,7 @@ export const drinks: Record<string, Drink> = {
     name: "Smoked Salmon Bloody Mary",
     city: "Anchorage",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Alaska's bold twist on the classic Bloody Mary, garnished with a stick of smoked salmon.",
     recipe: {
       ingredients: [
@@ -117,7 +117,7 @@ export const drinks: Record<string, Drink> = {
     name: "Margarita",
     city: "Los Angeles",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "LA's year-round sunshine calls for the perfect margarita — fresh, bright, and never from a mix.",
     recipe: {
       ingredients: [
@@ -140,7 +140,7 @@ export const drinks: Record<string, Drink> = {
     name: "Colorado Bulldog",
     city: "Denver",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "A creamy, caffeinated cocktail beloved in the Rocky Mountain state.",
     recipe: {
       ingredients: [
@@ -163,7 +163,7 @@ export const drinks: Record<string, Drink> = {
     name: "Paloma",
     city: "Mexico City",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Mexico's most popular tequila cocktail — outselling the margarita on home turf.",
     recipe: {
       ingredients: [
@@ -186,7 +186,7 @@ export const drinks: Record<string, Drink> = {
     name: "The Manhattan",
     city: "New York",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Rye whiskey cocktail born in NYC's Manhattan Club in the 1870s. The city in a glass.",
     recipe: {
       ingredients: [
@@ -208,7 +208,7 @@ export const drinks: Record<string, Drink> = {
     name: "Terremoto",
     city: "Santiago",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Chile's 'earthquake' cocktail — sweet pipeño wine with pineapple ice cream. Dangerously drinkable.",
     recipe: {
       ingredients: [
@@ -231,7 +231,7 @@ export const drinks: Record<string, Drink> = {
     name: "Fernet con Coca",
     city: "Buenos Aires",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Argentina's go-to nightlife drink. The bitter herbal spirit meets cola — a national obsession.",
     recipe: {
       ingredients: [
@@ -252,7 +252,7 @@ export const drinks: Record<string, Drink> = {
     name: "Caipirinha",
     city: "Fernando de Noronha",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Brazil's national cocktail — muddled limes, sugar, and cachaça on a tropical island paradise.",
     recipe: {
       ingredients: [
@@ -274,7 +274,7 @@ export const drinks: Record<string, Drink> = {
     name: "Grogue",
     city: "Praia",
     type: "spirit",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Cape Verde's sugarcane spirit, distilled on the islands and sipped neat or with honey and lime.",
     recipe: {
       ingredients: [
@@ -296,7 +296,7 @@ export const drinks: Record<string, Drink> = {
     name: "Gin & Tonic",
     city: "London",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "The British colonial-era classic, elevated to an art form in London's cocktail bars.",
     recipe: {
       ingredients: [
@@ -318,7 +318,7 @@ export const drinks: Record<string, Drink> = {
     name: "French 75",
     city: "Paris",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Champagne cocktail born at the Ritz Paris — named for the French 75mm field gun for its kick.",
     recipe: {
       ingredients: [
@@ -342,7 +342,7 @@ export const drinks: Record<string, Drink> = {
     name: "Mint Tea",
     city: "Cairo",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "North African hospitality in a glass — sweet, fragrant, and always offered to guests.",
     recipe: {
       ingredients: [
@@ -366,7 +366,7 @@ export const drinks: Record<string, Drink> = {
     name: "Moscow Mule",
     city: "Moscow",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Vodka, ginger beer, and lime — invented to market both Smirnoff vodka and ginger beer in 1940s America.",
     recipe: {
       ingredients: [
@@ -388,7 +388,7 @@ export const drinks: Record<string, Drink> = {
     name: "Doogh",
     city: "Tehran",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Iran's beloved yogurt drink — tangy, minty, and the perfect companion to kebabs.",
     recipe: {
       ingredients: [
@@ -412,7 +412,7 @@ export const drinks: Record<string, Drink> = {
     name: "Karak Chai",
     city: "Dubai",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Dubai's street-side staple — strong, milky, cardamom-spiced tea served in small cups.",
     recipe: {
       ingredients: [
@@ -437,7 +437,7 @@ export const drinks: Record<string, Drink> = {
     name: "Kahwah",
     city: "Kabul",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "A fragrant green tea with cardamom and saffron, central to Afghan hospitality.",
     recipe: {
       ingredients: [
@@ -462,7 +462,7 @@ export const drinks: Record<string, Drink> = {
     name: "Lassi",
     city: "Karachi",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Pakistan's beloved yogurt drink — sweet or salted, always refreshing in the heat.",
     recipe: {
       ingredients: [
@@ -486,7 +486,7 @@ export const drinks: Record<string, Drink> = {
     name: "Masala Chai",
     city: "Mumbai",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "India's iconic spiced tea — brewed strong with ginger, cardamom, and whole milk on every street corner.",
     recipe: {
       ingredients: [
@@ -512,7 +512,7 @@ export const drinks: Record<string, Drink> = {
     name: "Tongba",
     city: "Kathmandu",
     type: "spirit",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Nepal's traditional millet beer, sipped through a bamboo straw from a wooden vessel.",
     recipe: {
       ingredients: [
@@ -534,7 +534,7 @@ export const drinks: Record<string, Drink> = {
     name: "Borhani",
     city: "Dhaka",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Bangladesh's spiced yogurt drink, traditionally served at weddings and feasts.",
     recipe: {
       ingredients: [
@@ -560,7 +560,7 @@ export const drinks: Record<string, Drink> = {
     name: "Lahpet Yay",
     city: "Yangon",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Myanmar's green tea — light, slightly bitter, and served free at every teahouse.",
     recipe: {
       ingredients: [
@@ -581,7 +581,7 @@ export const drinks: Record<string, Drink> = {
     name: "Thai Iced Tea",
     city: "Bangkok",
     type: "non-alcoholic",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Thailand's iconic street drink — bold, sweet, creamy, and that unmistakable orange glow.",
     recipe: {
       ingredients: [
@@ -605,7 +605,7 @@ export const drinks: Record<string, Drink> = {
     name: "Singapore Sling",
     city: "Singapore",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Created at the Raffles Hotel Long Bar in 1915 — a rosy gin cocktail that defined tropical elegance.",
     recipe: {
       ingredients: [
@@ -632,7 +632,7 @@ export const drinks: Record<string, Drink> = {
     name: "Whisky Highball",
     city: "Tokyo",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Japan's ubiquitous after-work drink. Simple, precise, and endlessly refreshing.",
     recipe: {
       ingredients: [
@@ -655,7 +655,7 @@ export const drinks: Record<string, Drink> = {
     name: "Espresso Martini",
     city: "Adelaide",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Australia's coffee-meets-cocktail obsession — shaken cold, served up, always with three beans.",
     recipe: {
       ingredients: [
@@ -679,7 +679,7 @@ export const drinks: Record<string, Drink> = {
     name: "Flat White Martini",
     city: "Sydney",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "Sydney's twist on the espresso martini — smoother, milkier, inspired by Australia's flat white coffee culture.",
     recipe: {
       ingredients: [
@@ -703,7 +703,7 @@ export const drinks: Record<string, Drink> = {
     name: "Ti' Punch",
     city: "Noumea",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "A French island classic — rhum agricole, lime, and cane syrup. Simple, potent, and sun-soaked.",
     recipe: {
       ingredients: [
@@ -727,7 +727,7 @@ export const drinks: Record<string, Drink> = {
     name: "L&P Shandy",
     city: "Auckland",
     type: "cocktail",
-    tagline: "Drink like a local:",
+    tagline: "Drink like a local",
     description: "New Zealand's cult lemon soda meets beer — a Kiwi summer essential.",
     recipe: {
       ingredients: [

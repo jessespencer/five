@@ -42,7 +42,7 @@ const fallbackDrink: Drink = {
   name: "Local Brew",
   city: "",
   type: "spirit",
-  tagline: "Drink like a local:",
+  tagline: "Drink like a local",
   description:
     "Ask a local for their favorite — every place has a story in a glass.",
   recipe: {
@@ -90,22 +90,17 @@ export function getFiveOClockData(): FiveOClockResult {
   const { location, hours, minutes, seconds } = fiveMatch!;
   const drink = drinks[location.city] || { ...fallbackDrink, city: location.city };
 
-  // Sort: active city (5 PM) first, then descending — 4 PM, 3 PM, 2 PM...
-  // Only include cities within a 12-hour window (17:xx down to 06:xx)
-  const activeIndex = allLocations.indexOf(fiveMatch!);
-  const descending = [
-    allLocations[activeIndex],
-    ...allLocations.slice(0, activeIndex).reverse(),
-    ...allLocations.slice(activeIndex + 1).reverse(),
-  ];
+  // Show active city first, then cities with earlier times (approaching 5 PM).
+  // Use raw UTC offset difference (no wrapping) to determine west/behind.
+  const fiveOffset = fiveMatch!.location.utcOffset;
 
-  const fiveTotal = fiveMatch!.hours * 60 + fiveMatch!.minutes;
-  const withinWindow = descending.filter((entry) => {
-    const entryTotal = entry.hours * 60 + entry.minutes;
-    let diff = fiveTotal - entryTotal;
-    if (diff < 0) diff += 24 * 60;
-    return diff < 12 * 60;
-  });
+  const withinWindow = allLocations
+    .filter((entry) => {
+      const diff = fiveOffset - entry.location.utcOffset;
+      return diff >= 0 && diff < 12;
+    })
+    .sort((a, b) => a.location.utcOffset - b.location.utcOffset)
+    .reverse();
 
   // Deduplicate cities sharing the same hour (DST collisions).
   // Alternate which one shows based on current minute so it rotates on load.
@@ -115,7 +110,6 @@ export function getFiveOClockData(): FiveOClockResult {
     const count = seen.get(h) ?? 0;
     seen.set(h, count + 1);
     if (count === 0) return true;
-    // For duplicates, alternate: even minutes show first occurrence, odd show second
     return (minutes % 2 === 1) === (count === 1);
   });
 

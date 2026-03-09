@@ -18,23 +18,35 @@ export default function TimezoneTicker({
 }: TimezoneTickerProps) {
   return (
     <div
-      className="overflow-y-auto h-full scrollbar-hide pr-2"
+      className="overflow-y-auto h-full scrollbar-hide"
       style={{ scrollbarWidth: "none" }}
     >
-      <div className="flex flex-col gap-1 py-2">
+      <div className="flex flex-col gap-1">
         <AnimatePresence mode="popLayout" initial={false}>
-          {allLocations.map(({ location, hours, minutes }) => {
+          {allLocations.map(({ location, hours, minutes }, index) => {
             const isActive = location.city === activeCity;
+            const prevIsActive =
+              index > 0 && allLocations[index - 1].location.city === activeCity;
             return (
-              <motion.div
-                key={location.city}
+              <div key={location.city}>
+                {isActive && (
+                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
+                    Now
+                  </span>
+                )}
+                {prevIsActive && (
+                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mt-4 mb-3">
+                    Up Next
+                  </span>
+                )}
+                <motion.div
                 layout
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className={`
-                  flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors
+                  flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors -mx-1
                   ${isActive ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
                 `}
               >
@@ -62,6 +74,7 @@ export default function TimezoneTicker({
                   {formatTime(hours, minutes)}
                 </span>
               </motion.div>
+              </div>
             );
           })}
         </AnimatePresence>

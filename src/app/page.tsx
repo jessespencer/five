@@ -33,8 +33,8 @@ export default function Home() {
   if (!result) return null;
 
   return (
-    <main className="h-dvh w-full bg-[var(--background)] transition-colors duration-300 overflow-hidden">
-      <div className="h-full max-w-[1400px] mx-auto flex flex-col p-4 md:p-6 lg:p-8 gap-4 md:gap-5">
+    <main className="min-h-dvh w-full bg-[var(--background)] transition-colors duration-300">
+      <div className="min-h-dvh max-w-[1400px] mx-auto flex flex-col p-4 md:p-6 lg:p-8 gap-4 md:gap-5">
         {/* Header */}
         <header className="flex items-center justify-between shrink-0">
           <h1 className="text-2xl font-black tracking-tight">Five</h1>
@@ -66,7 +66,7 @@ export default function Home() {
         {/* Tiles + Sidebar */}
         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 md:gap-5">
           {/* Left column — map + recipe */}
-          <div className="flex flex-col gap-4 md:gap-5 min-h-0 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+          <div className="flex flex-col gap-4 md:gap-5">
             {/* World Map */}
             <div className="bg-[var(--sheet-bg)] rounded-2xl p-4 md:p-5 shrink-0 transition-colors">
               <div className="flex items-center justify-between mb-3">
@@ -86,16 +86,13 @@ export default function Home() {
             </div>
 
             {/* Recipe Tile */}
-            <div className="shrink-0 pb-2">
+            <div className="shrink-0">
               <RecipeTile drink={result.drink} isTransitioning={isTransitioning} />
             </div>
           </div>
 
           {/* Right column — timezone ticker (desktop only) */}
-          <div className="hidden lg:flex flex-col min-h-0 bg-[var(--sheet-bg)] rounded-2xl p-3 transition-colors">
-            <span className="text-xs font-semibold tracking-widest uppercase opacity-30 px-3 py-2">
-              World Clock
-            </span>
+          <div className="hidden lg:flex flex-col bg-[var(--sheet-bg)] rounded-2xl p-4 md:p-5 transition-colors overflow-hidden">
             <TimezoneTicker
               allLocations={result.allLocations}
               activeCity={result.location.city}
