@@ -64,6 +64,7 @@ export default function TimezoneTicker({
         focusIndexRef.current = next;
         const city = allLocations[next]?.location.city;
         if (city) {
+          onCityClick?.(city);
           const row = rowRefs.current.get(city);
           row?.focus();
           row?.scrollIntoView({ block: "nearest" });
@@ -74,6 +75,7 @@ export default function TimezoneTicker({
         focusIndexRef.current = prev;
         const city = allLocations[prev]?.location.city;
         if (city) {
+          onCityClick?.(city);
           const row = rowRefs.current.get(city);
           row?.focus();
           row?.scrollIntoView({ block: "nearest" });
@@ -133,7 +135,7 @@ export default function TimezoneTicker({
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 onClick={() => onCityClick?.(location.city)}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCityClick?.(location.city); } }}
+                onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !isEffective) { e.preventDefault(); onCityClick?.(location.city); } }}
                 className={`
                   flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/30
                   ${isEffective ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
