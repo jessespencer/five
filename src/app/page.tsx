@@ -149,12 +149,14 @@ export default function Home() {
               </AnimatePresence>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <ClockTagline />
-              <div className="flex items-center gap-2">
-                <MapPin size={16} strokeWidth={1.5} className="opacity-40" />
-                <span className="text-xl font-bold tracking-tight">{displayLocation.city}</span>
-                <span className="text-xl font-light opacity-30 -ml-0.5">{displayLocation.country}</span>
+            <div className="flex items-center gap-4 pl-4">
+              <MapPin size={24} strokeWidth={1.5} className="opacity-40 shrink-0" />
+              <div className="flex flex-col gap-1">
+                <ClockTagline />
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold tracking-tight">{displayLocation.city}</span>
+                  <span className="text-xl font-light opacity-30 -ml-0.5">{displayLocation.country}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -188,6 +190,21 @@ export default function Home() {
               />
             </div>
           </div>
+
+          {/* Footer */}
+          <footer className="py-6 text-center">
+            <span className="text-xs opacity-30">
+              Built by{" "}
+              <a
+                href="https://www.jessedestroys.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-60 transition-opacity"
+              >
+                jessedestroys.com
+              </a>
+            </span>
+          </footer>
         </div>
       </div>
 

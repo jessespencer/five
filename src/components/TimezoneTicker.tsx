@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { LocationTime } from "@/utils/timezone";
 import { getAccentForHour } from "@/utils/accentColor";
@@ -29,9 +30,52 @@ export default function TimezoneTicker({
   is24h = false,
 }: TimezoneTickerProps) {
   const effectiveCity = previewCity ?? activeCity;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  const effectiveIndex = allLocations.findIndex(
+    (lt) => lt.location.city === effectiveCity
+  );
+
+  const navigateTo = useCallback(
+    (index: number) => {
+      const city = allLocations[index]?.location.city;
+      if (city) {
+        onCityClick?.(city);
+        rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
+      }
+    },
+    [allLocations, onCityClick]
+  );
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = Math.min(effectiveIndex + 1, allLocations.length - 1);
+        navigateTo(next);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const prev = Math.max(effectiveIndex - 1, 0);
+        navigateTo(prev);
+      } else if (e.key === "Escape") {
+        // Deselect preview by clicking the current effective city again
+        onCityClick?.(effectiveCity);
+      }
+    }
+
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
+  }, [effectiveIndex, allLocations, effectiveCity, navigateTo, onCityClick]);
+
   return (
     <div
-      className="overflow-y-auto h-full scrollbar-hide"
+      ref={containerRef}
+      tabIndex={0}
+      className="overflow-y-auto h-full scrollbar-hide outline-none"
       style={{ scrollbarWidth: "none" }}
     >
       <div className="flex flex-col gap-1">
@@ -44,7 +88,13 @@ export default function TimezoneTicker({
               index > 0 && allLocations[index - 1].location.city === activeCity;
             const showUpNext = prevIsRealActive && hours < 17;
             return (
-              <div key={location.city}>
+              <div
+                key={location.city}
+                ref={(el) => {
+                  if (el) rowRefs.current.set(location.city, el);
+                  else rowRefs.current.delete(location.city);
+                }}
+              >
                 {isRealActive && (
                   <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
                     Now
