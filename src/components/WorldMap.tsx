@@ -100,28 +100,25 @@ export default function WorldMap({
         ))}
 
         {/* Timezone highlight band */}
-        <rect
-          x={lineX - 20}
+        <motion.rect
           y={0}
           width={40}
           height={500}
           className="fill-[var(--foreground)]"
           opacity={0.04}
+          animate={{ x: lineX - 20 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
         />
 
         {/* Timezone line */}
         <motion.line
-          x1={lineX}
           y1={0}
-          x2={lineX}
           y2={500}
           className="stroke-[var(--foreground)]"
           strokeWidth={1.5}
-          opacity={0.2}
           strokeDasharray="6 4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.2 }}
-          transition={{ duration: 0.6 }}
+          animate={{ x1: lineX, x2: lineX, opacity: 0.2 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
         />
 
         {/* City dots */}
@@ -136,7 +133,7 @@ export default function WorldMap({
                   cx={cx}
                   cy={cy}
                   r={12}
-                  className="fill-[var(--foreground)]"
+                  className="fill-[var(--accent)]"
                   opacity={0.08}
                   initial={{ r: 6 }}
                   animate={{ r: 12 }}
@@ -152,7 +149,7 @@ export default function WorldMap({
                 cx={cx}
                 cy={cy}
                 r={isActive ? 5 : isFiveOClock ? 4 : 3}
-                className="fill-[var(--foreground)]"
+                className={isActive ? "fill-[var(--accent)]" : "fill-[var(--foreground)]"}
                 opacity={isActive ? 0.9 : 0.2}
               />
             </g>

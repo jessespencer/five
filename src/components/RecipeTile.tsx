@@ -7,17 +7,17 @@ import type { Drink } from "@/data/drinks";
 
 interface RecipeTileProps {
   drink: Drink;
-  isTransitioning: boolean;
+  accentColor: string;
+  accentTextColor: "#000" | "#fff";
 }
 
-export default function RecipeTile({ drink, isTransitioning }: RecipeTileProps) {
+export default function RecipeTile({ drink, accentColor, accentTextColor }: RecipeTileProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div
-      className="bg-amber-400 dark:bg-amber-500 text-black rounded-2xl overflow-hidden cursor-pointer transition-colors"
-      animate={{ opacity: isTransitioning ? 0 : 1 }}
-      transition={{ duration: 0.3 }}
+      className="rounded-2xl overflow-hidden cursor-pointer"
+      style={{ backgroundColor: accentColor, color: accentTextColor }}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* Header — always visible */}
@@ -67,7 +67,8 @@ export default function RecipeTile({ drink, isTransitioning }: RecipeTileProps) 
                 {drink.recipe.ingredients.map((ing, i) => (
                   <div
                     key={i}
-                    className="flex items-baseline justify-between py-2 border-b border-black/20 last:border-0"
+                    className="flex items-baseline justify-between py-2 last:border-0"
+                    style={{ borderBottomWidth: "1px", borderColor: `${accentTextColor}33` }}
                   >
                     <span className="text-sm">{ing.item}</span>
                     <span className="text-xs opacity-70 ml-3 whitespace-nowrap tabular-nums">
@@ -93,7 +94,10 @@ export default function RecipeTile({ drink, isTransitioning }: RecipeTileProps) 
               </div>
 
               {/* Details */}
-              <div className="flex gap-6 pt-3 border-t border-black/20">
+              <div
+                className="flex gap-6 pt-3"
+                style={{ borderTopWidth: "1px", borderColor: `${accentTextColor}33` }}
+              >
                 <div>
                   <span className="text-[10px] font-semibold tracking-widest uppercase opacity-60">
                     Glass
