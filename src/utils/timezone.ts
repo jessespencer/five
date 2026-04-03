@@ -73,18 +73,21 @@ export function getFiveOClockData(): FiveOClockResult {
     }
   }
 
-  // Fallback: find closest to 17:00
+  // Fallback: no city is exactly at 17:xx right now.
+  // Pick the city that most recently passed 5 PM (hour 18, lowest minutes first)
+  // so we don't jump ahead to a city that hasn't hit 5 yet.
   if (!fiveMatch) {
-    let closestDiff = Infinity;
+    let bestEntry: LocationTime | null = null;
+    let bestDist = Infinity;
     for (const entry of allLocations) {
-      const totalMins = entry.hours * 60 + entry.minutes;
-      const diff = Math.abs(totalMins - 17 * 60);
-      const wrappedDiff = Math.min(diff, 24 * 60 - diff);
-      if (wrappedDiff < closestDiff) {
-        closestDiff = wrappedDiff;
-        fiveMatch = entry;
+      // How many minutes ago was 17:00 in this timezone? (only consider cities past 5 PM)
+      const minsSince = (entry.hours - 17) * 60 + entry.minutes;
+      if (minsSince > 0 && minsSince < bestDist) {
+        bestDist = minsSince;
+        bestEntry = entry;
       }
     }
+    fiveMatch = bestEntry ?? allLocations[0];
   }
 
   const { location, hours, minutes, seconds } = fiveMatch!;

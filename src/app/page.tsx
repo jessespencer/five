@@ -29,7 +29,13 @@ function HomeContent() {
         document.documentElement.classList.add("dark");
       }
       const storedClock = localStorage.getItem("five-clock-format");
-      if (storedClock === "24h") setIs24h(true);
+      if (storedClock === "24h") {
+        setIs24h(true);
+      } else if (!storedClock) {
+        // Detect system 24h preference from locale
+        const hourFormat = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions().hourCycle;
+        if (hourFormat === "h23" || hourFormat === "h24") setIs24h(true);
+      }
     } catch {
       // localStorage unavailable (private browsing)
     }
