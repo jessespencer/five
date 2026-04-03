@@ -16,14 +16,14 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
 
   return (
     <motion.div
-      className="rounded-2xl overflow-hidden cursor-pointer"
+      className="rounded-3xl overflow-hidden cursor-pointer"
       style={{ backgroundColor: accentColor, color: accentTextColor }}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* Header — always visible */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <Wine size={20} strokeWidth={1.5} className="shrink-0 opacity-75" />
+      <div className="flex items-center justify-between pl-4 pr-5 py-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <Wine size={24} strokeWidth={1.5} className="shrink-0 opacity-75" />
           <div className="min-w-0">
             <p className="text-xs tracking-wide opacity-75">{drink.tagline}</p>
             <h3 className="text-lg font-bold tracking-tight truncate">
@@ -50,7 +50,7 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5">
+            <div className="px-14 pb-14">
               <p className="text-sm leading-relaxed opacity-75 mb-1">
                 {drink.description}
               </p>
