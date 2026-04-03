@@ -90,28 +90,28 @@ export function getFiveOClockData(): FiveOClockResult {
   const { location, hours, minutes, seconds } = fiveMatch!;
   const drink = drinks[location.city] || { ...fallbackDrink, city: location.city };
 
-  // Show active city first, then cities with earlier times (approaching 5 PM).
-  // Use raw UTC offset difference (no wrapping) to determine west/behind.
+  // Sort all locations so the active city is first, then progress westward
+  // (next cities to hit 5 PM), wrapping around the date line.
   const fiveOffset = fiveMatch!.location.utcOffset;
 
-  const withinWindow = allLocations
-    .filter((entry) => {
-      const diff = fiveOffset - entry.location.utcOffset;
-      return diff >= 0 && diff < 12;
-    })
-    .sort((a, b) => a.location.utcOffset - b.location.utcOffset)
-    .reverse();
-
-  // Deduplicate cities sharing the same hour (DST collisions).
-  // Alternate which one shows based on current minute so it rotates on load.
-  const seen = new Map<number, number>();
-  const filtered = withinWindow.filter((entry) => {
-    const h = entry.hours;
-    const count = seen.get(h) ?? 0;
-    seen.set(h, count + 1);
-    if (count === 0) return true;
-    return (minutes % 2 === 1) === (count === 1);
+  const sorted = [...allLocations].sort((a, b) => {
+    // Distance "behind" the active city (how far west / how soon until 5 PM)
+    const distA = (fiveOffset - a.location.utcOffset + 24) % 24;
+    const distB = (fiveOffset - b.location.utcOffset + 24) % 24;
+    return distA - distB;
   });
 
-  return { location, drink, hours, minutes, seconds, allLocations: filtered };
+  // Deduplicate cities sharing the same time — randomly pick one per time slot.
+  // Seed on current minute so the pick stays stable for 60 seconds.
+  const seen = new Map<string, boolean>();
+  const deduped = sorted.filter((entry) => {
+    const key = `${entry.hours}:${entry.minutes}`;
+    if (seen.has(key)) return false;
+    const dupes = sorted.filter((e) => `${e.hours}:${e.minutes}` === key);
+    const pick = dupes[minutes % dupes.length];
+    seen.set(key, true);
+    return entry.location.city === pick.location.city;
+  });
+
+  return { location, drink, hours, minutes, seconds, allLocations: deduped };
 }
