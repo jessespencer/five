@@ -54,14 +54,19 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
 
   return (
     <motion.div
-      className="rounded-3xl overflow-hidden cursor-pointer"
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`${drink.name} recipe — ${isExpanded ? "collapse" : "expand"}`}
+      className="rounded-3xl overflow-hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--foreground)]"
       style={{ backgroundColor: accentColor, color: accentTextColor }}
       onClick={() => setIsExpanded(!isExpanded)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsExpanded(!isExpanded); } }}
     >
       {/* Header — always visible */}
       <div className="flex items-center justify-between pl-4 pr-5 py-4">
         <div className="flex items-center gap-4 min-w-0">
-          <Wine size={24} strokeWidth={1.5} className="shrink-0 opacity-75" />
+          <Wine aria-hidden="true" size={24} strokeWidth={1.5} className="shrink-0 opacity-75" />
           <div className="min-w-0">
             <p className="text-xs tracking-wide opacity-75">{drink.tagline}</p>
             <h3 className="text-lg font-bold tracking-tight truncate">
@@ -74,7 +79,7 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
           transition={{ duration: 0.2 }}
           className="opacity-60 shrink-0 ml-3"
         >
-          <ChevronDown size={20} />
+          <ChevronDown aria-hidden="true" size={20} />
         </motion.div>
       </div>
 
@@ -159,7 +164,7 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
                   className={`h-9 px-4 flex items-center gap-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${accentTextColor === "#fff" ? "bg-white/15 hover:bg-white/25" : "bg-black/10 hover:bg-black/20"}`}
                   aria-label={copied ? "Copied" : "Copy recipe"}
                 >
-                  {copied ? <Check size={16} strokeWidth={1.5} /> : <Copy size={16} strokeWidth={1.5} />}
+                  {copied ? <Check aria-hidden="true" size={16} strokeWidth={1.5} /> : <Copy aria-hidden="true" size={16} strokeWidth={1.5} />}
                   {copied ? "Copied" : "Copy"}
                 </button>
                 <button
@@ -167,7 +172,7 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
                   className={`h-9 px-4 flex items-center gap-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${accentTextColor === "#fff" ? "bg-white/15 hover:bg-white/25" : "bg-black/10 hover:bg-black/20"}`}
                   aria-label="Share recipe"
                 >
-                  <Share2 size={16} strokeWidth={1.5} />
+                  <Share2 aria-hidden="true" size={16} strokeWidth={1.5} />
                   Share
                 </button>
               </div>

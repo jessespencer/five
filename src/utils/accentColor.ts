@@ -1,5 +1,3 @@
-type HSL = [number, number, number];
-
 function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
@@ -12,23 +10,6 @@ function rgbToHex(r: number, g: number, b: number): string {
       .map((c) => Math.round(Math.max(0, Math.min(255, c))).toString(16).padStart(2, "0"))
       .join("")
   );
-}
-
-function rgbToHsl(r: number, g: number, b: number): HSL {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return [0, 0, l];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h = 0;
-  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-  else if (max === g) h = ((b - r) / d + 2) / 6;
-  else h = ((r - g) / d + 4) / 6;
-  return [h * 360, s, l];
 }
 
 function hslToRgb(h: number, s: number, l: number): [number, number, number] {
@@ -55,64 +36,30 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   ];
 }
 
-function hexToHsl(hex: string): HSL {
-  return rgbToHsl(...hexToRgb(hex));
-}
-
 function hslToHex(h: number, s: number, l: number): string {
   return rgbToHex(...hslToRgb(h, s, l));
 }
 
-function lerpHsl(a: HSL, b: HSL, t: number): HSL {
-  // Shortest-arc hue interpolation
-  let dh = b[0] - a[0];
-  if (dh > 180) dh -= 360;
-  if (dh < -180) dh += 360;
-  const h = a[0] + dh * t;
-  const s = a[1] + (b[1] - a[1]) * t;
-  const l = a[2] + (b[2] - a[2]) * t;
-  return [h, s, l];
-}
+// Starting hue — our classic amber/orange (#D97B3A ≈ 25°)
+const START_HUE = 25;
 
-const COLOR_STOPS: [number, string][] = [
-  [0,  "#1E2535"],  // midnight — darkest point
-  [2,  "#1E2535"],  // deep midnight — stays dark
-  [4,  "#2A3A3A"],  // pre-dawn — dark teal hint
-  [6,  "#4A5A40"],  // dawn — dark olive
-  [8,  "#6B6B38"],  // morning — warm olive
-  [10, "#8B7035"],  // late morning — warm clay-olive
-  [12, "#A57534"],  // noon — medium amber
-  [14, "#BE7A36"],  // afternoon — warm amber
-  [16, "#D07838"],  // late afternoon — rich amber
-  [17, "#D97B3A"],  // 5 o'clock — hero burnt orange
-  [18, "#C87038"],  // early evening — warm deep orange
-  [19, "#B06535"],  // evening — warm sienna
-  [20, "#905530"],  // dusk — warm brown
-  [21, "#704528"],  // twilight — dark warm brown
-  [22, "#503520"],  // night — deep warm brown
-  [23, "#352A1E"],  // late night — very dark brown
-  [24, "#1E2535"],  // wraps to midnight
-];
+export function getAccentForHour(hour: number, isDark = true): string {
+  // hour is spread from 17..41, so normalize 0..1 across the full cycle
+  const t = ((hour - 17) % 24 + 24) % 24 / 24;
+  const hue = (START_HUE + t * 360) % 360;
 
-const HSL_STOPS: [number, HSL][] = COLOR_STOPS.map(([hour, hex]) => [
-  hour,
-  hexToHsl(hex),
-]);
+  // Blend from vibrant hero at t=0 to muted pastels, ramping back near t=1
+  // Uses a sine curve so both ends (near the hero) stay warm/vibrant
+  const blend = Math.sin(t * Math.PI);
 
-export function getAccentForHour(hour: number): string {
-  const h = ((hour % 24) + 24) % 24;
-
-  for (let i = 0; i < HSL_STOPS.length - 1; i++) {
-    const [h0, hsl0] = HSL_STOPS[i];
-    const [h1, hsl1] = HSL_STOPS[i + 1];
-    if (h >= h0 && h <= h1) {
-      const t = h0 === h1 ? 0 : (h - h0) / (h1 - h0);
-      const [hue, sat, lit] = lerpHsl(hsl0, hsl1, t);
-      return hslToHex(hue, sat, lit);
-    }
+  if (isDark) {
+    const sat = 0.65 - blend * 0.35;  // 0.65 → 0.30 → 0.65
+    const lit = 0.50 - blend * 0.15;  // 0.50 → 0.35 → 0.50
+    return hslToHex(hue, sat, lit);
   }
-
-  return COLOR_STOPS[0][1];
+  const sat = 0.60 - blend * 0.25;    // 0.60 → 0.35 → 0.60
+  const lit = 0.58 + blend * 0.04;    // 0.58 → 0.62 → 0.58
+  return hslToHex(hue, sat, lit);
 }
 
 export function getTextColorForAccent(hex: string): "#000" | "#fff" {

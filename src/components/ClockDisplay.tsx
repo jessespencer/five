@@ -17,7 +17,7 @@ export function ClockTagline() {
   const [phrase] = useState(
     () => PHRASES[Math.floor(Math.random() * PHRASES.length)]
   );
-  return <span className="text-sm tracking-wider opacity-50">{phrase}</span>;
+  return <span className="text-xs tracking-wide opacity-50">{phrase}</span>;
 }
 
 interface ClockDisplayProps {
@@ -40,7 +40,7 @@ export default function ClockDisplay({
   const ss = seconds.toString().padStart(2, "0");
 
   return (
-    <div className="flex items-baseline gap-1">
+    <div className="flex items-baseline gap-1" aria-live="polite" aria-atomic="true" role="timer">
       <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
         {hh}:{mm}
       </span>

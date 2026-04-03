@@ -10,31 +10,36 @@ import WorldMap from "@/components/WorldMap";
 import TimezoneTicker from "@/components/TimezoneTicker";
 import RecipeTile from "@/components/RecipeTile";
 import { drinks } from "@/data/drinks";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
-export default function Home() {
+function HomeContent() {
   const [isDark, setIsDark] = useState(false);
   const [is24h, setIs24h] = useState(false);
   const [previewCity, setPreviewCity] = useState<string | null>(null);
   const { result } = useFiveOClock();
 
   useEffect(() => {
-    const stored = localStorage.getItem("five-theme");
-    if (
-      stored === "dark" ||
-      (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
+    try {
+      const stored = localStorage.getItem("five-theme");
+      if (
+        stored === "dark" ||
+        (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        setIsDark(true);
+        document.documentElement.classList.add("dark");
+      }
+      const storedClock = localStorage.getItem("five-clock-format");
+      if (storedClock === "24h") setIs24h(true);
+    } catch {
+      // localStorage unavailable (private browsing)
     }
-    const storedClock = localStorage.getItem("five-clock-format");
-    if (storedClock === "24h") setIs24h(true);
   }, []);
 
   function toggleTheme() {
     const next = !isDark;
     setIsDark(next);
     document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("five-theme", next ? "dark" : "light");
+    try { localStorage.setItem("five-theme", next ? "dark" : "light"); } catch {}
   }
 
   useEffect(() => {
@@ -65,7 +70,7 @@ export default function Home() {
     ? result.allLocations.findIndex((lt) => lt.location.city === previewCity)
     : 0;
   const spreadHour = 17 + (displayIndex / result.allLocations.length) * 24;
-  const accent = getAccentForHour(spreadHour);
+  const accent = getAccentForHour(spreadHour, isDark);
   const accentTextColor = getTextColorForAccent(accent);
 
   return (
@@ -73,6 +78,12 @@ export default function Home() {
       className="min-h-dvh w-full bg-[var(--background)] transition-colors duration-300 lg:flex lg:flex-row"
       style={{ "--accent": accent } as React.CSSProperties}
     >
+      <a
+        href="#clock"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-full focus:bg-[var(--foreground)] focus:text-[var(--background)] focus:text-sm focus:font-semibold"
+      >
+        Skip to content
+      </a>
       {/* Main content — scrollable */}
       <div className="flex-1 min-h-dvh lg:overflow-y-auto">
         <div className="max-w-[1100px] mx-auto flex flex-col p-4 md:p-6 lg:p-8 gap-4 md:gap-5">
@@ -83,7 +94,7 @@ export default function Home() {
                 onClick={() => setPreviewCity(null)}
                 className="flex items-center gap-1.5 text-2xl font-black tracking-tight opacity-50 hover:opacity-80 transition-opacity"
               >
-                <ArrowLeft size={24} strokeWidth={1.5} /> Back to five
+                <ArrowLeft aria-hidden="true" size={24} strokeWidth={1.5} /> Back to five
               </button>
             ) : (
               <h1 className="text-2xl font-black tracking-tight">Five</h1>
@@ -95,7 +106,7 @@ export default function Home() {
                 aria-label="Clock format"
               >
                 <button
-                  onClick={() => { setIs24h(false); localStorage.setItem("five-clock-format", "12h"); }}
+                  onClick={() => { setIs24h(false); try { localStorage.setItem("five-clock-format", "12h"); } catch {} }}
                   className={`h-7 px-2.5 rounded-full text-xs font-semibold tabular-nums transition-colors ${!is24h ? "bg-[var(--foreground)]/10" : "opacity-40 hover:opacity-70"}`}
                   role="radio"
                   aria-checked={!is24h}
@@ -103,7 +114,7 @@ export default function Home() {
                   12h
                 </button>
                 <button
-                  onClick={() => { setIs24h(true); localStorage.setItem("five-clock-format", "24h"); }}
+                  onClick={() => { setIs24h(true); try { localStorage.setItem("five-clock-format", "24h"); } catch {} }}
                   className={`h-7 px-2.5 rounded-full text-xs font-semibold tabular-nums transition-colors ${is24h ? "bg-[var(--foreground)]/10" : "opacity-40 hover:opacity-70"}`}
                   role="radio"
                   aria-checked={is24h}
@@ -117,16 +128,16 @@ export default function Home() {
                 aria-label="Toggle dark mode"
               >
                 {isDark ? (
-                  <Sun size={16} strokeWidth={1.5} />
+                  <Sun aria-hidden="true" size={16} strokeWidth={1.5} />
                 ) : (
-                  <Moon size={16} strokeWidth={1.5} />
+                  <Moon aria-hidden="true" size={16} strokeWidth={1.5} />
                 )}
               </button>
             </div>
           </header>
 
           {/* Clock */}
-          <div className="shrink-0 flex flex-col gap-8">
+          <div id="clock" className="shrink-0 flex flex-col gap-8">
             <div className="overflow-hidden">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -147,12 +158,12 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-4 pl-4">
-              <MapPin size={24} strokeWidth={1.5} className="opacity-40 shrink-0" />
+              <MapPin aria-hidden="true" size={24} strokeWidth={1.5} className="opacity-40 shrink-0" />
               <div className="flex flex-col gap-1">
                 <ClockTagline />
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold tracking-tight">{displayLocation.city}</span>
-                  <span className="text-xl font-light opacity-30 -ml-0.5">{displayLocation.country}</span>
+                  <span className="text-lg font-bold tracking-tight">{displayLocation.city}</span>
+                  <span className="text-lg font-light opacity-30 -ml-0.5">{displayLocation.country}</span>
                 </div>
               </div>
             </div>
@@ -201,7 +212,7 @@ export default function Home() {
                 jessedestroys.com
               </a>
               {" "}
-              <span className="opacity-50">v1.0.0</span>
+              <span className="opacity-50">v1.1.0</span>
             </span>
           </footer>
         </div>
@@ -215,8 +226,17 @@ export default function Home() {
           previewCity={previewCity}
           onCityClick={handleCityClick}
           is24h={is24h}
+          isDark={isDark}
         />
       </aside>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <ErrorBoundary>
+      <HomeContent />
+    </ErrorBoundary>
   );
 }

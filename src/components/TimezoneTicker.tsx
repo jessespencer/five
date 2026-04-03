@@ -11,6 +11,7 @@ interface TimezoneTickerProps {
   previewCity?: string | null;
   onCityClick?: (city: string) => void;
   is24h?: boolean;
+  isDark?: boolean;
 }
 
 function formatTime(h: number, m: number, is24h: boolean): string {
@@ -28,6 +29,7 @@ export default function TimezoneTicker({
   previewCity,
   onCityClick,
   is24h = false,
+  isDark = true,
 }: TimezoneTickerProps) {
   const effectiveCity = previewCity ?? activeCity;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,31 +39,44 @@ export default function TimezoneTicker({
     (lt) => lt.location.city === effectiveCity
   );
 
+  const focusIndexRef = useRef(effectiveIndex);
+
+  // Sync focus index when selection changes
+  useEffect(() => {
+    focusIndexRef.current = effectiveIndex;
+  }, [effectiveIndex]);
+
   // Store mutable values in refs so the keydown listener doesn't need to reattach every second
-  const stateRef = useRef({ effectiveIndex, allLocations, previewCity, onCityClick });
-  stateRef.current = { effectiveIndex, allLocations, previewCity, onCityClick };
+  const stateRef = useRef({ allLocations, previewCity, onCityClick });
+  useEffect(() => {
+    stateRef.current = { allLocations, previewCity, onCityClick };
+  });
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     function handleKeyDown(e: KeyboardEvent) {
-      const { effectiveIndex, allLocations, previewCity, onCityClick } = stateRef.current;
+      const { allLocations, previewCity, onCityClick } = stateRef.current;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        const next = Math.min(effectiveIndex + 1, allLocations.length - 1);
+        const next = Math.min(focusIndexRef.current + 1, allLocations.length - 1);
+        focusIndexRef.current = next;
         const city = allLocations[next]?.location.city;
         if (city) {
-          onCityClick?.(city);
-          rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
+          const row = rowRefs.current.get(city);
+          row?.focus();
+          row?.scrollIntoView({ block: "nearest" });
         }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const prev = Math.max(effectiveIndex - 1, 0);
+        const prev = Math.max(focusIndexRef.current - 1, 0);
+        focusIndexRef.current = prev;
         const city = allLocations[prev]?.location.city;
         if (city) {
-          onCityClick?.(city);
-          rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
+          const row = rowRefs.current.get(city);
+          row?.focus();
+          row?.scrollIntoView({ block: "nearest" });
         }
       } else if (e.key === "Escape" && previewCity) {
         onCityClick?.(previewCity);
@@ -76,27 +91,23 @@ export default function TimezoneTicker({
     <div
       ref={containerRef}
       tabIndex={0}
-      className="overflow-y-auto h-full scrollbar-hide outline-none"
+      role="listbox"
+      aria-label="Timezone list"
+      className="overflow-y-auto h-full scrollbar-hide outline-none p-1 -m-1"
       style={{ scrollbarWidth: "none" }}
     >
       <div className="flex flex-col gap-1">
         <AnimatePresence mode="popLayout" initial={false}>
-          {allLocations.map(({ location, hours, minutes, seconds }, index) => {
+          {allLocations.map(({ location, hours, minutes }, index) => {
             const isEffective = location.city === effectiveCity;
             const isRealActive = location.city === activeCity;
             const spreadHour = 17 + (index / allLocations.length) * 24;
-            const cityAccent = getAccentForHour(spreadHour);
+            const cityAccent = getAccentForHour(spreadHour, isDark);
             const prevIsRealActive =
               index > 0 && allLocations[index - 1].location.city === activeCity;
             const showUpNext = prevIsRealActive;
             return (
-              <div
-                key={location.city}
-                ref={(el) => {
-                  if (el) rowRefs.current.set(location.city, el);
-                  else rowRefs.current.delete(location.city);
-                }}
-              >
+              <div key={location.city}>
                 {isRealActive && (
                   <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
                     Now
@@ -108,14 +119,23 @@ export default function TimezoneTicker({
                   </span>
                 )}
                 <motion.div
+                ref={(el: HTMLDivElement | null) => {
+                  if (el) rowRefs.current.set(location.city, el);
+                  else rowRefs.current.delete(location.city);
+                }}
                 layout
+                role="option"
+                aria-selected={isEffective}
+                aria-label={`${location.city}, ${formatTime(hours, minutes, is24h)}`}
+                tabIndex={0}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 onClick={() => onCityClick?.(location.city)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCityClick?.(location.city); } }}
                 className={`
-                  flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors -mx-1 cursor-pointer
+                  flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/30
                   ${isEffective ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
                 `}
               >

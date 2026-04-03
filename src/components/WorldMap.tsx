@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { motion } from "framer-motion";
 import type { LocationTime } from "@/utils/timezone";
 
@@ -54,6 +55,7 @@ export default function WorldMap({
   activeCity,
   activeLongitude,
 }: WorldMapProps) {
+  const uid = useId();
   const lineX = lonToX(activeLongitude);
 
   return (
@@ -62,10 +64,12 @@ export default function WorldMap({
         viewBox="0 0 1000 500"
         className="w-full h-full"
         preserveAspectRatio="xMidYMid meet"
+        role="img"
+        aria-label="World map highlighting the active timezone"
       >
         <defs>
           <pattern
-            id="dotPattern"
+            id={`${uid}-dot`}
             width="14"
             height="14"
             patternUnits="userSpaceOnUse"
@@ -79,7 +83,7 @@ export default function WorldMap({
             />
           </pattern>
           <pattern
-            id="dotPatternActive"
+            id={`${uid}-dotActive`}
             width="14"
             height="14"
             patternUnits="userSpaceOnUse"
@@ -96,7 +100,7 @@ export default function WorldMap({
 
         {/* Continents */}
         {continents.map((d, i) => (
-          <path key={i} d={d} fill="url(#dotPattern)" stroke="none" />
+          <path key={i} d={d} fill={`url(#${uid}-dot)`} stroke="none" />
         ))}
 
         {/* Timezone highlight band */}
