@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { LocationTime } from "@/utils/timezone";
 import { getAccentForHour } from "@/utils/accentColor";
@@ -37,39 +37,40 @@ export default function TimezoneTicker({
     (lt) => lt.location.city === effectiveCity
   );
 
-  const navigateTo = useCallback(
-    (index: number) => {
-      const city = allLocations[index]?.location.city;
-      if (city) {
-        onCityClick?.(city);
-        rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
-      }
-    },
-    [allLocations, onCityClick]
-  );
+  // Store mutable values in refs so the keydown listener doesn't need to reattach every second
+  const stateRef = useRef({ effectiveIndex, allLocations, previewCity, onCityClick });
+  stateRef.current = { effectiveIndex, allLocations, previewCity, onCityClick };
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     function handleKeyDown(e: KeyboardEvent) {
+      const { effectiveIndex, allLocations, previewCity, onCityClick } = stateRef.current;
       if (e.key === "ArrowDown") {
         e.preventDefault();
         const next = Math.min(effectiveIndex + 1, allLocations.length - 1);
-        navigateTo(next);
+        const city = allLocations[next]?.location.city;
+        if (city) {
+          onCityClick?.(city);
+          rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
+        }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         const prev = Math.max(effectiveIndex - 1, 0);
-        navigateTo(prev);
-      } else if (e.key === "Escape") {
-        // Deselect preview by clicking the current effective city again
-        onCityClick?.(effectiveCity);
+        const city = allLocations[prev]?.location.city;
+        if (city) {
+          onCityClick?.(city);
+          rowRefs.current.get(city)?.scrollIntoView({ block: "nearest" });
+        }
+      } else if (e.key === "Escape" && previewCity) {
+        onCityClick?.(previewCity);
       }
     }
 
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
-  }, [effectiveIndex, allLocations, effectiveCity, navigateTo, onCityClick]);
+  }, []);
 
   return (
     <div
@@ -83,10 +84,11 @@ export default function TimezoneTicker({
           {allLocations.map(({ location, hours, minutes, seconds }, index) => {
             const isEffective = location.city === effectiveCity;
             const isRealActive = location.city === activeCity;
-            const cityAccent = getAccentForHour(hours + minutes / 60 + seconds / 3600);
+            const spreadHour = 17 + (index / allLocations.length) * 24;
+            const cityAccent = getAccentForHour(spreadHour);
             const prevIsRealActive =
               index > 0 && allLocations[index - 1].location.city === activeCity;
-            const showUpNext = prevIsRealActive && hours < 17;
+            const showUpNext = prevIsRealActive;
             return (
               <div
                 key={location.city}

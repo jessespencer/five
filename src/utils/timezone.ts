@@ -90,26 +90,15 @@ export function getFiveOClockData(): FiveOClockResult {
   const { location, hours, minutes, seconds } = fiveMatch!;
   const drink = drinks[location.city] || { ...fallbackDrink, city: location.city };
 
-  // Sort: active city first, then cities approaching 5 PM (hours < 17,
-  // descending so closest-to-5 is next), then cities past 5 PM (hours > 17,
-  // ascending so just-past is last before the far-past ones).
-  const activeCity = fiveMatch!.location.city;
+  // Sort by continuous westward progression from the active city.
+  // Each next city is ~1 hour behind, wrapping through midnight.
+  // This gives a smooth, unbroken time sequence down the list.
+  const fiveOffset = fiveMatch!.location.utcOffset;
 
   const sorted = [...allLocations].sort((a, b) => {
-    const aIsActive = a.location.city === activeCity ? 1 : 0;
-    const bIsActive = b.location.city === activeCity ? 1 : 0;
-    if (aIsActive !== bIsActive) return bIsActive - aIsActive; // active first
-
-    const aIsPast = a.hours > 17 ? 1 : 0;
-    const bIsPast = b.hours > 17 ? 1 : 0;
-    if (aIsPast !== bIsPast) return aIsPast - bIsPast; // approaching before past
-
-    if (!aIsPast) {
-      // Both approaching 5 PM — closest to 17 first (descending hours, then minutes)
-      return b.hours * 60 + b.minutes - (a.hours * 60 + a.minutes);
-    }
-    // Both past 5 PM — just past 5 first (ascending)
-    return a.hours * 60 + a.minutes - (b.hours * 60 + b.minutes);
+    const distA = ((fiveOffset - a.location.utcOffset) % 24 + 24) % 24;
+    const distB = ((fiveOffset - b.location.utcOffset) % 24 + 24) % 24;
+    return distA - distB;
   });
 
   return { location, drink, hours, minutes, seconds, allLocations: sorted };

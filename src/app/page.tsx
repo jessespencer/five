@@ -37,12 +37,6 @@ export default function Home() {
     localStorage.setItem("five-theme", next ? "dark" : "light");
   }
 
-  function toggleClockFormat() {
-    const next = !is24h;
-    setIs24h(next);
-    localStorage.setItem("five-clock-format", next ? "24h" : "12h");
-  }
-
   useEffect(() => {
     if (previewCity && result?.location.city === previewCity) {
       setPreviewCity(null);
@@ -67,8 +61,11 @@ export default function Home() {
     ? (drinks[previewEntry.location.city] ?? result.drink)
     : result.drink;
 
-  const decimalHour = displayHours + displayMinutes / 60 + displaySeconds / 3600;
-  const accent = getAccentForHour(decimalHour);
+  const displayIndex = previewEntry
+    ? result.allLocations.findIndex((lt) => lt.location.city === previewCity)
+    : 0;
+  const spreadHour = 17 + (displayIndex / result.allLocations.length) * 24;
+  const accent = getAccentForHour(spreadHour);
   const accentTextColor = getTextColorForAccent(accent);
 
   return (

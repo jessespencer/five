@@ -75,23 +75,23 @@ function lerpHsl(a: HSL, b: HSL, t: number): HSL {
 }
 
 const COLOR_STOPS: [number, string][] = [
-  [0,  "#1B2240"],  // midnight — deep navy
-  [2,  "#1A2E3D"],  // dark teal-navy
-  [4,  "#1E3A3A"],  // dark ocean teal
-  [6,  "#3A6B5C"],  // dawn — muted teal-green
-  [8,  "#6B8F5E"],  // morning — sage green
-  [10, "#8B8840"],  // late morning — warm olive
-  [12, "#B87040"],  // noon — soft terracotta
-  [14, "#D4923A"],  // afternoon — warm amber
-  [16, "#E0B030"],  // approaching golden hour
-  [17, "#E8C547"],  // 5 o'clock — hero golden amber
-  [18, "#D97B3A"],  // sunset — burnt orange
-  [19, "#C45060"],  // dusk — coral rose
-  [20, "#A04080"],  // evening — rose pink
-  [21, "#7B3090"],  // twilight — mauve purple
-  [22, "#4D2878"],  // night — deep violet
-  [23, "#302060"],  // late night — dark indigo-violet
-  [24, "#1B2240"],  // wraps to midnight
+  [0,  "#1E2535"],  // midnight — darkest point
+  [2,  "#1E2535"],  // deep midnight — stays dark
+  [4,  "#2A3A3A"],  // pre-dawn — dark teal hint
+  [6,  "#4A5A40"],  // dawn — dark olive
+  [8,  "#6B6B38"],  // morning — warm olive
+  [10, "#8B7035"],  // late morning — warm clay-olive
+  [12, "#A57534"],  // noon — medium amber
+  [14, "#BE7A36"],  // afternoon — warm amber
+  [16, "#D07838"],  // late afternoon — rich amber
+  [17, "#D97B3A"],  // 5 o'clock — hero burnt orange
+  [18, "#C87038"],  // early evening — warm deep orange
+  [19, "#B06535"],  // evening — warm sienna
+  [20, "#905530"],  // dusk — warm brown
+  [21, "#704528"],  // twilight — dark warm brown
+  [22, "#503520"],  // night — deep warm brown
+  [23, "#352A1E"],  // late night — very dark brown
+  [24, "#1E2535"],  // wraps to midnight
 ];
 
 const HSL_STOPS: [number, HSL][] = COLOR_STOPS.map(([hour, hex]) => [
