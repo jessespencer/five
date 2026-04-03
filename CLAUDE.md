@@ -24,14 +24,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/data/drinks.ts` — `Record<string, Drink>` keyed by city name. Each drink has a full recipe. A fallback "Local Brew" drink exists in `timezone.ts` for cities without an entry.
 
 **Accent color system:**
-- `src/utils/accentColor.ts` — `getAccentForHour(hour)` returns a hex color from a warm-to-dark-to-warm palette. The sidebar ticker and recipe tile use index-based coloring (mapping list position to 0–24h starting at hour 17) for smooth visual progression. The palette stays in warm brown/amber tones, darkening through the middle of the list and ramping back to the hero burnt orange.
+- `src/utils/accentColor.ts` — `getAccentForHour(hour, isDark)` returns a hex color using a pure HSL hue rotation. Starting at amber/orange (25°), the hue cycles through the full rainbow across 24 hours. A sine-curve blends saturation/lightness: vibrant near the hero color, muted pastels in the middle. Light and dark mode share the same hue arc but use different saturation and lightness values.
+- The sidebar ticker and recipe tile use index-based coloring (mapping list position to hours starting at 17) for smooth visual progression.
 - `getTextColorForAccent(hex)` returns `"#000"` or `"#fff"` based on luminance contrast.
 
 **Components (all client-side):**
-- `ClockDisplay` — Large time display supporting 12h/24h format
-- `WorldMap` — SVG equirectangular map with continent paths, animated timezone line, city dots
-- `TimezoneTicker` — Locked sidebar panel listing all timezones in westward order, clickable for city preview, keyboard navigable (arrow keys, escape)
-- `RecipeTile` — Expandable accent-colored card showing drink name, ingredients, method, with copy/share buttons
+- `ClockDisplay` — Large time display supporting 12h/24h format, `aria-live` for screen readers
+- `WorldMap` — SVG equirectangular map with continent paths, animated timezone line, city dots. Uses `useId()` for unique SVG pattern IDs.
+- `TimezoneTicker` — Locked sidebar panel (`role="listbox"`) listing all timezones in westward order. Clickable for city preview, full keyboard navigation (Arrow keys move focus, Enter/Space select, Escape deselect).
+- `RecipeTile` — Expandable accent-colored card (`role="button"`, `aria-expanded`) showing drink name, ingredients, method, with copy/share buttons. Keyboard accessible.
+- `ErrorBoundary` — Class component wrapping the app; shows recovery UI with `role="alert"` on crash.
 
 **City preview:** Clicking a city in the sidebar sets `previewCity` state, which swaps the clock, map, recipe, and accent color to that city. The header changes to "← Back to five" to return to live mode. Preview auto-clears when the previewed city becomes the active 5 PM city.
 
@@ -43,9 +45,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Deployment:** GitHub Pages via `.github/workflows/deploy.yml`. `basePath` is `/five` in production. Images are unoptimized (required for static export).
 
+**Accessibility:**
+- Skip navigation link, `prefers-reduced-motion` media query in `globals.css`
+- All decorative Lucide icons have `aria-hidden="true"`
+- `localStorage` calls wrapped in try/catch for private browsing compatibility
+- WCAG 2.1 AA targeted
+
 ## Conventions
 
 - All components are `"use client"` — this is a fully client-rendered app
 - Font: Instrument Sans loaded via `next/font/google`
 - Drink entries are keyed by city name and must match `locations.ts` city names exactly
 - Version displayed in footer, tracked in `package.json`
+- 3 pre-existing lint warnings (`setState-in-effect`) for localStorage hydration and interval polling — these are intentional patterns

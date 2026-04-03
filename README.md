@@ -13,6 +13,10 @@ A real-time web app that tracks which timezone is at 5 PM and serves up a signat
 - Click any city in the sidebar to preview its time, drink, and map position
 - 12h/24h clock format toggle (persisted)
 - Dark/light theme toggle (persisted)
+- Rainbow accent color gradient across the timezone list
+- Keyboard accessible — Arrow keys, Enter/Space, Escape navigation
+- WCAG 2.1 AA accessibility: skip nav, aria labels, reduced motion support
+- Error boundary with recovery UI
 - Fully client-rendered, static export — no server required
 
 ## Stack
