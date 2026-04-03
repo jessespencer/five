@@ -200,6 +200,8 @@ export default function Home() {
               >
                 jessedestroys.com
               </a>
+              {" "}
+              <span className="opacity-50">v1.0.0</span>
             </span>
           </footer>
         </div>
