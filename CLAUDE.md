@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-**Stack:** Next.js 16 (App Router) + React 19 + Tailwind CSS v4 + Framer Motion + Lucide icons. Static export deployed to GitHub Pages via `output: "export"` in `next.config.ts`.
+**Stack:** Next.js 16 (App Router) + React 19 + Tailwind CSS v4 + Framer Motion + canvas-confetti + Lucide icons. Static export deployed to GitHub Pages via `output: "export"` in `next.config.ts`.
 
 **Core data flow:**
 - `src/utils/timezone.ts` — `getFiveOClockData()` is the central function. Runs every second via the `useFiveOClock` hook. Uses `Intl.DateTimeFormat` to compute the current time in each timezone, finds the one at 5 PM (or closest), and sorts all locations in continuous westward progression from the active city.
@@ -27,12 +27,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/utils/accentColor.ts` — `getAccentForHour(hour, isDark)` returns a hex color using a pure HSL hue rotation. Starting at amber/orange (25°), the hue cycles through the full rainbow across 24 hours. A sine-curve blends saturation/lightness: vibrant near the hero color, muted pastels in the middle. Light and dark mode share the same hue arc but use different saturation and lightness values.
 - The sidebar ticker and recipe tile use index-based coloring (mapping list position to hours starting at 17) for smooth visual progression.
 - `getTextColorForAccent(hex)` returns `"#000"` or `"#fff"` based on luminance contrast.
+- Saturation values: hero (t=0) is 0.75 dark / 0.70 light; mid-range fades via sine curve.
+
+**Confetti system:**
+- `src/components/Confetti.tsx` — Uses `canvas-confetti` library with custom SVG path shapes (heart, tree, pint) via `shapeFromPath()`. Renders a fullscreen `<canvas>` + dimmed background + animated text overlay.
+- Two trigger modes via `ConfettiMessage` type:
+  - `{ type: "five", city }` — fired on 5 PM city transitions. Shows "It's **Five** in {city}".
+  - `{ type: "tagline", tagline, city }` — fired by party popper button. Shows a random tagline (from `PHRASES` in ClockDisplay) above the bold city name.
+- Fireworks pattern: 3-second duration, dual bursts from left/right every 250ms, tapering particle count.
+- Colors are sampled dynamically from `getAccentForHour()` to match the sidebar ticker palette.
+- `disableForReducedMotion: true` respects the user's motion preferences.
+- `ClockDisplay.tsx` exports `PHRASES` array for reuse by the confetti tagline mode.
 
 **Components (all client-side):**
-- `ClockDisplay` — Large time display supporting 12h/24h format, `aria-live` for screen readers
+- `ClockDisplay` — Large time display supporting 12h/24h format, `aria-live` for screen readers. Exports `PHRASES` array of taglines.
 - `WorldMap` — SVG equirectangular map with continent paths, animated timezone line, city dots. Uses `useId()` for unique SVG pattern IDs.
 - `TimezoneTicker` — Locked sidebar panel (`role="listbox"`) listing all timezones in westward order. Clickable for city preview, full keyboard navigation (Arrow keys move focus, Enter/Space select, Escape deselect).
 - `RecipeTile` — Expandable accent-colored card (`role="button"`, `aria-expanded`) showing drink name, ingredients, method, with copy/share buttons. Keyboard accessible.
+- `Confetti` — Canvas-based confetti overlay with text; see "Confetti system" above.
 - `ErrorBoundary` — Class component wrapping the app; shows recovery UI with `role="alert"` on crash.
 
 **City preview:** Clicking a city in the sidebar sets `previewCity` state, which swaps the clock, map, recipe, and accent color to that city. The header changes to "← Back to five" to return to live mode. Preview auto-clears when the previewed city becomes the active 5 PM city.

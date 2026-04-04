@@ -12,8 +12,10 @@ A real-time web app that tracks which timezone is at 5 PM and serves up a signat
 - Signature drink recipe for each city with copy/share support
 - Click any city in the sidebar to preview its time, drink, and map position
 - 12h/24h clock format toggle (persisted)
+- Confetti fireworks with custom drink-themed shapes on 5 PM transitions
+- Party popper button with random taglines
 - Dark/light theme toggle (persisted)
-- Rainbow accent color gradient across the timezone list
+- Rainbow accent color gradient across the timezone list (high-saturation hero colors)
 - Keyboard accessible — Arrow keys, Enter/Space, Escape navigation
 - WCAG 2.1 AA accessibility: skip nav, aria labels, reduced motion support
 - Error boundary with recovery UI
@@ -21,7 +23,7 @@ A real-time web app that tracks which timezone is at 5 PM and serves up a signat
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Framer Motion · Lucide icons
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Framer Motion · canvas-confetti · Lucide icons
 
 ## Getting Started
 
