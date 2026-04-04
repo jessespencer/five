@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const PHRASES = [
+export const PHRASES = [
   "They're pouring in...",
   "Cheers from...",
   "Happy hour has hit in...",

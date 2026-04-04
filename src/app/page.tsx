@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Sun, Moon, MapPin, ArrowLeft } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Sun, Moon, MapPin, ArrowLeft, PartyPopper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFiveOClock } from "@/hooks/useFiveOClock";
 import { getAccentForHour, getTextColorForAccent } from "@/utils/accentColor";
-import ClockDisplay, { ClockTagline } from "@/components/ClockDisplay";
+import ClockDisplay, { ClockTagline, PHRASES } from "@/components/ClockDisplay";
 import WorldMap from "@/components/WorldMap";
 import TimezoneTicker from "@/components/TimezoneTicker";
 import RecipeTile from "@/components/RecipeTile";
 import { drinks } from "@/data/drinks";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Confetti, { type ConfettiMessage } from "@/components/Confetti";
 
 function HomeContent() {
   const [isDark, setIsDark] = useState(false);
   const [is24h, setIs24h] = useState(false);
   const [previewCity, setPreviewCity] = useState<string | null>(null);
+  const [confettiMessage, setConfettiMessage] = useState<ConfettiMessage | null>(null);
+  const prevActiveCityRef = useRef<string | null>(null);
   const { result } = useFiveOClock();
 
   useEffect(() => {
@@ -54,6 +57,15 @@ function HomeContent() {
     }
   }, [result?.location.city, previewCity]);
 
+  // Fire confetti when the active city changes (real 5 PM transition, not preview)
+  useEffect(() => {
+    const city = result?.location.city ?? null;
+    if (prevActiveCityRef.current && city && city !== prevActiveCityRef.current) {
+      setConfettiMessage({ type: "five", city });
+    }
+    prevActiveCityRef.current = city;
+  }, [result?.location.city]);
+
   const handleCityClick = useCallback((city: string) => {
     setPreviewCity((prev) => (prev === city ? null : city));
   }, []);
@@ -84,6 +96,9 @@ function HomeContent() {
       className="min-h-dvh w-full bg-[var(--background)] transition-colors duration-300 lg:flex lg:flex-row"
       style={{ "--accent": accent } as React.CSSProperties}
     >
+      <AnimatePresence>
+        {confettiMessage && <Confetti message={confettiMessage} onComplete={() => setConfettiMessage(null)} />}
+      </AnimatePresence>
       <a
         href="#clock"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-full focus:bg-[var(--foreground)] focus:text-[var(--background)] focus:text-sm focus:font-semibold"
@@ -128,6 +143,16 @@ function HomeContent() {
                   24h
                 </button>
               </div>
+              <button
+                onClick={() => {
+                  const tagline = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+                  setConfettiMessage({ type: "tagline", tagline, city: displayLocation.city });
+                }}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-colors"
+                aria-label="Launch confetti"
+              >
+                <PartyPopper aria-hidden="true" size={16} strokeWidth={1.5} />
+              </button>
               <button
                 onClick={toggleTheme}
                 className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-colors"
@@ -235,6 +260,7 @@ function HomeContent() {
           isDark={isDark}
         />
       </aside>
+
     </main>
   );
 }
