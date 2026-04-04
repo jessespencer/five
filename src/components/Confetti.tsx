@@ -3,15 +3,15 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
+import { getAccentForHour } from "@/utils/accentColor";
 
-const COLORS = [
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#8b5cf6", // violet
-  "#06b6d4", // cyan
-  "#10b981", // emerald
-  "#f97316", // orange
-];
+// Sample 8 evenly-spaced colors from the accent hue rotation
+function getConfettiColors(isDark: boolean): string[] {
+  return Array.from({ length: 8 }, (_, i) => {
+    const hour = 17 + (i / 8) * 24;
+    return getAccentForHour(hour, isDark);
+  });
+}
 
 // Drink-themed SVG paths for shapeFromPath()
 
@@ -45,10 +45,11 @@ export type ConfettiMessage =
 
 interface ConfettiProps {
   message: ConfettiMessage;
+  isDark: boolean;
   onComplete: () => void;
 }
 
-export default function Confetti({ message, onComplete }: ConfettiProps) {
+export default function Confetti({ message, isDark, onComplete }: ConfettiProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onCompleteRef = useRef(onComplete);
 
@@ -80,12 +81,14 @@ export default function Confetti({ message, onComplete }: ConfettiProps) {
 
     const shapes = [cocktail, star, pint];
 
+    const colors = getConfettiColors(isDark);
+
     const defaults: confetti.Options = {
       scalar: 1,
       startVelocity: 30,
       spread: 360,
       ticks: 60,
-      colors: COLORS,
+      colors,
       shapes,
       disableForReducedMotion: true,
     };

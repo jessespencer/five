@@ -97,7 +97,7 @@ function HomeContent() {
       style={{ "--accent": accent } as React.CSSProperties}
     >
       <AnimatePresence>
-        {confettiMessage && <Confetti message={confettiMessage} onComplete={() => setConfettiMessage(null)} />}
+        {confettiMessage && <Confetti message={confettiMessage} isDark={isDark} onComplete={() => setConfettiMessage(null)} />}
       </AnimatePresence>
       <a
         href="#clock"
@@ -243,7 +243,7 @@ function HomeContent() {
                 jessedestroys.com
               </a>
               {" "}
-              <span className="opacity-50">v1.1.0</span>
+              <span className="opacity-50">v1.2.0</span>
             </span>
           </footer>
         </div>

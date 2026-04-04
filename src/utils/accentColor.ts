@@ -53,12 +53,12 @@ export function getAccentForHour(hour: number, isDark = true): string {
   const blend = Math.sin(t * Math.PI);
 
   if (isDark) {
-    const sat = 0.65 - blend * 0.35;  // 0.65 → 0.30 → 0.65
+    const sat = 0.75 - blend * 0.40;  // 0.75 → 0.35 → 0.75
     const lit = 0.50 - blend * 0.15;  // 0.50 → 0.35 → 0.50
     return hslToHex(hue, sat, lit);
   }
-  const sat = 0.60 - blend * 0.25;    // 0.60 → 0.35 → 0.60
-  const lit = 0.58 + blend * 0.04;    // 0.58 → 0.62 → 0.58
+  const sat = 0.70 - blend * 0.30;    // 0.70 → 0.40 → 0.70
+  const lit = 0.56 + blend * 0.04;    // 0.56 → 0.60 → 0.56
   return hslToHex(hue, sat, lit);
 }
 
