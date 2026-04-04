@@ -159,6 +159,27 @@ export const drinks: Record<string, Drink> = {
     },
     isAlcoholic: true,
   },
+  "Chicago": {
+    name: "The Chicago Handshake",
+    city: "Chicago",
+    type: "cocktail",
+    tagline: "Drink like a local",
+    description: "A shot of Jeppson's Malört chased by an Old Style beer — Chicago's unofficial initiation ritual.",
+    recipe: {
+      ingredients: [
+        { amount: "1.5 oz", item: "Jeppson's Malört" },
+        { amount: "1 can", item: "Old Style lager" },
+      ],
+      instructions: [
+        "Pour the Malört into a shot glass.",
+        "Crack open the Old Style.",
+        "Shoot the Malört, chase with the beer.",
+      ],
+      glass: "Shot glass + beer can",
+      garnish: "A knowing look",
+    },
+    isAlcoholic: true,
+  },
   "Mexico City": {
     name: "Paloma",
     city: "Mexico City",

@@ -100,17 +100,18 @@ export default function TimezoneTicker({
     >
       <div className="flex flex-col gap-1">
         <AnimatePresence mode="popLayout" initial={false}>
-          {allLocations.map(({ location, hours, minutes }, index) => {
+          {allLocations.map(({ location, hours, minutes, isFiveOClock }, index) => {
             const isEffective = location.city === effectiveCity;
-            const isRealActive = location.city === activeCity;
+            const isHighlighted = isEffective || (!previewCity && isFiveOClock);
+            const isRealActive = isFiveOClock;
             const spreadHour = 17 + (index / allLocations.length) * 24;
             const cityAccent = getAccentForHour(spreadHour, isDark);
             const prevIsRealActive =
-              index > 0 && allLocations[index - 1].location.city === activeCity;
-            const showUpNext = prevIsRealActive;
+              index > 0 && allLocations[index - 1].isFiveOClock;
+            const showUpNext = prevIsRealActive && !isFiveOClock;
             return (
               <div key={location.city}>
-                {isRealActive && (
+                {isRealActive && (index === 0 || !allLocations[index - 1].isFiveOClock) && (
                   <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
                     Now
                   </span>
@@ -138,17 +139,17 @@ export default function TimezoneTicker({
                 onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !isEffective) { e.preventDefault(); onCityClick?.(location.city); } }}
                 className={`
                   flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/30
-                  ${isEffective ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
+                  ${isHighlighted ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
                 `}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <div
                     className="w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{ backgroundColor: cityAccent, opacity: isEffective ? 1 : 0.5 }}
+                    style={{ backgroundColor: cityAccent, opacity: isHighlighted ? 1 : 0.5 }}
                   />
                   <span
                     className={`text-xs truncate ${
-                      isEffective ? "font-semibold" : "opacity-50"
+                      isHighlighted ? "font-semibold" : "opacity-50"
                     }`}
                   >
                     {location.city}
@@ -156,7 +157,7 @@ export default function TimezoneTicker({
                 </div>
                 <span
                   className={`text-xs tabular-nums whitespace-nowrap ${
-                    isEffective ? "font-bold" : "opacity-40"
+                    isHighlighted ? "font-bold" : "opacity-40"
                   }`}
                 >
                   {formatTime(hours, minutes, is24h)}

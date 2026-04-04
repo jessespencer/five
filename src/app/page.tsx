@@ -12,12 +12,14 @@ import RecipeTile from "@/components/RecipeTile";
 import { drinks } from "@/data/drinks";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Confetti, { type ConfettiMessage } from "@/components/Confetti";
+import LoadingClock from "@/components/LoadingClock";
 
 function HomeContent() {
   const [isDark, setIsDark] = useState(false);
   const [is24h, setIs24h] = useState(false);
   const [previewCity, setPreviewCity] = useState<string | null>(null);
   const [confettiMessage, setConfettiMessage] = useState<ConfettiMessage | null>(null);
+  const [loadingDone, setLoadingDone] = useState(false);
   const prevActiveCityRef = useRef<string | null>(null);
   const { result } = useFiveOClock();
 
@@ -70,12 +72,21 @@ function HomeContent() {
     setPreviewCity((prev) => (prev === city ? null : city));
   }, []);
 
-  if (!result) return null;
+  const handleLoadingComplete = useCallback(() => {
+    setLoadingDone(true);
+  }, []);
+
+  if (!result || !loadingDone) {
+    return (
+      <LoadingClock is24h={is24h} onComplete={handleLoadingComplete} />
+    );
+  }
 
   const previewEntry = previewCity
     ? result.allLocations.find((lt) => lt.location.city === previewCity) ?? null
     : null;
 
+  const displayEntry = previewEntry ?? result.allLocations[0];
   const displayLocation = previewEntry ? previewEntry.location : result.location;
   const displayHours = previewEntry ? previewEntry.hours : result.hours;
   const displayMinutes = previewEntry ? previewEntry.minutes : result.minutes;
@@ -209,8 +220,8 @@ function HomeContent() {
                   Time Zone
                 </span>
                 <span className="text-xs opacity-30 tabular-nums">
-                  UTC {displayLocation.utcOffset >= 0 ? "+" : ""}
-                  {displayLocation.utcOffset}
+                  UTC {displayEntry.liveUtcOffset >= 0 ? "+" : ""}
+                  {displayEntry.liveUtcOffset}
                 </span>
               </div>
               <WorldMap

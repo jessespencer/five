@@ -15,6 +15,7 @@ export const locations: Location[] = [
   { utcOffset: -8, city: "Los Angeles", country: "United States", timezone: "America/Los_Angeles", longitude: -118.2, latitude: 34.1 },
   { utcOffset: -7, city: "Denver", country: "United States", timezone: "America/Denver", longitude: -104.9, latitude: 39.7 },
   { utcOffset: -6, city: "Mexico City", country: "Mexico", timezone: "America/Mexico_City", longitude: -99.1, latitude: 19.4 },
+  { utcOffset: -6, city: "Chicago", country: "United States", timezone: "America/Chicago", longitude: -87.6, latitude: 41.9 },
   { utcOffset: -5, city: "New York", country: "United States", timezone: "America/New_York", longitude: -74.0, latitude: 40.7 },
   { utcOffset: -4, city: "Santiago", country: "Chile", timezone: "America/Santiago", longitude: -70.7, latitude: -33.4 },
   { utcOffset: -3, city: "Buenos Aires", country: "Argentina", timezone: "America/Argentina/Buenos_Aires", longitude: -58.4, latitude: -34.6 },

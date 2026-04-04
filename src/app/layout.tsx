@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Five — It's 5 o'clock somewhere",
   description:
     "Find out where it's 5 PM right now and discover the signature drink of that city.",
+  other: {
+    "google": "notranslate",
+  },
 };
 
 export const viewport: Viewport = {
@@ -28,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="notranslate" translate="no">
       <body className={`${instrumentSans.variable} antialiased`}>
         {children}
       </body>
