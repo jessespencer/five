@@ -76,9 +76,13 @@ function HomeContent() {
     setLoadingDone(true);
   }, []);
 
-  if (!result || !loadingDone) {
+  const isLoading = !result || !loadingDone;
+
+  if (isLoading) {
     return (
-      <LoadingClock is24h={is24h} onComplete={handleLoadingComplete} />
+      <AnimatePresence mode="wait">
+        <LoadingClock key="loading" is24h={is24h} onComplete={handleLoadingComplete} />
+      </AnimatePresence>
     );
   }
 
@@ -103,7 +107,11 @@ function HomeContent() {
   const accentTextColor = getTextColorForAccent(accent);
 
   return (
-    <main
+    <motion.main
+      key="main"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className="min-h-dvh w-full bg-[var(--background)] transition-colors duration-300 lg:flex lg:flex-row"
       style={{ "--accent": accent } as React.CSSProperties}
     >
@@ -181,7 +189,7 @@ function HomeContent() {
           {/* Clock */}
           <div id="clock" className="shrink-0 flex flex-col gap-8">
             <div className="overflow-hidden">
-              <AnimatePresence mode="wait" initial={false}>
+              <AnimatePresence mode="wait">
                 <motion.div
                   key={displayLocation.city}
                   initial={{ y: -20, opacity: 0 }}
@@ -272,7 +280,7 @@ function HomeContent() {
         />
       </aside>
 
-    </main>
+    </motion.main>
   );
 }
 

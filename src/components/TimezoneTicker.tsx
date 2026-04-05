@@ -102,7 +102,8 @@ export default function TimezoneTicker({
         <AnimatePresence mode="popLayout" initial={false}>
           {allLocations.map(({ location, hours, minutes, isFiveOClock }, index) => {
             const isEffective = location.city === effectiveCity;
-            const isHighlighted = isEffective || (!previewCity && isFiveOClock);
+            const isFirstFive = isFiveOClock && allLocations.findIndex((lt) => lt.isFiveOClock) === index;
+            const isHighlighted = isEffective || (!previewCity && isFirstFive);
             const isRealActive = isFiveOClock;
             const spreadHour = 17 + (index / allLocations.length) * 24;
             const cityAccent = getAccentForHour(spreadHour, isDark);

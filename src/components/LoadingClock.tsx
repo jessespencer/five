@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 const DURATION_MS = 2000;
-const TARGET_TOTAL_MINUTES = 300; // 5 hours × 60 minutes
+const START_MINUTES = 60; // 1:00 PM
+const TARGET_TOTAL_MINUTES = 300; // 5:00 PM
 
 // easeOutExpo — same feel as countUp.js
 function easeOutExpo(t: number, b: number, c: number, d: number): number {
@@ -16,9 +18,10 @@ interface LoadingClockProps {
 }
 
 export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
-  const [totalMinutes, setTotalMinutes] = useState(0);
+  const [totalMinutes, setTotalMinutes] = useState(START_MINUTES);
   const startRef = useRef<number | null>(null);
   const doneRef = useRef(false);
+  const [counted, setCounted] = useState(false);
 
   useEffect(() => {
     function tick(timestamp: number) {
@@ -26,8 +29,8 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       const elapsed = timestamp - startRef.current;
       const value = easeOutExpo(
         Math.min(elapsed, DURATION_MS),
-        0,
-        TARGET_TOTAL_MINUTES,
+        START_MINUTES,
+        TARGET_TOTAL_MINUTES - START_MINUTES,
         DURATION_MS
       );
 
@@ -38,7 +41,8 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       } else if (!doneRef.current) {
         doneRef.current = true;
         setTotalMinutes(TARGET_TOTAL_MINUTES);
-        setTimeout(onComplete, 500);
+        setCounted(true);
+        setTimeout(onComplete, 1100);
       }
     }
 
@@ -53,7 +57,12 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
   const mm = minutes.toString().padStart(2, "0");
 
   return (
-    <div lang="en" className="min-h-dvh w-full bg-[var(--background)] flex items-center justify-center transition-colors duration-300">
+    <motion.div
+      lang="en"
+      className="min-h-dvh w-full bg-[var(--background)] flex flex-col items-center justify-center transition-colors duration-300"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+    >
       <div className="flex items-baseline gap-1">
         <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
           {hh}:{mm}
@@ -64,6 +73,14 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
           </span>
         )}
       </div>
-    </div>
+      <motion.p
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-2xl font-light tracking-tight mt-4"
+      >
+        It&apos;s <span className="font-black">Five</span> o&apos;clock somewhere
+      </motion.p>
+    </motion.div>
   );
 }
