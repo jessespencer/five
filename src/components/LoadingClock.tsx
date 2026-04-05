@@ -79,7 +79,7 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="text-2xl font-light tracking-tight mt-4"
       >
-        It&apos;s <span className="font-black">Five</span> o&apos;clock somewhere
+        It&apos;s <span className="font-black">Five</span> o&apos;clock somewhere...
       </motion.p>
     </motion.div>
   );

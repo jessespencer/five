@@ -6,6 +6,10 @@
   --font-sans: var(--font-instrument);
 }
 
+button {
+  cursor: pointer;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #000000;

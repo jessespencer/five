@@ -5,7 +5,7 @@ import { Sun, Moon, MapPin, ArrowLeft, PartyPopper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFiveOClock } from "@/hooks/useFiveOClock";
 import { getAccentForHour, getTextColorForAccent } from "@/utils/accentColor";
-import ClockDisplay, { ClockTagline, PHRASES } from "@/components/ClockDisplay";
+import ClockDisplay, { ClockTagline, getPhrasesForHoursUntilFive, getConfettiConfig } from "@/components/ClockDisplay";
 import WorldMap from "@/components/WorldMap";
 import TimezoneTicker from "@/components/TimezoneTicker";
 import RecipeTile from "@/components/RecipeTile";
@@ -105,6 +105,7 @@ function HomeContent() {
   const spreadHour = 17 + (displayIndex / result.allLocations.length) * 24;
   const accent = getAccentForHour(spreadHour, isDark);
   const accentTextColor = getTextColorForAccent(accent);
+  const hoursUntilFive = (17 - displayHours + 24) % 24;
 
   return (
     <motion.main
@@ -132,9 +133,9 @@ function HomeContent() {
             {previewCity ? (
               <button
                 onClick={() => setPreviewCity(null)}
-                className="flex items-center gap-1.5 text-2xl font-black tracking-tight opacity-50 hover:opacity-80 transition-opacity"
+                className="flex items-center gap-1.5 text-2xl font-light tracking-tight opacity-40 hover:opacity-80 transition-opacity"
               >
-                <ArrowLeft aria-hidden="true" size={24} strokeWidth={1.5} /> Back to five
+                <ArrowLeft aria-hidden="true" size={24} strokeWidth={1.5} /> Back to <span className="font-black">Five</span>
               </button>
             ) : (
               <h1 className="text-2xl font-black tracking-tight">Five</h1>
@@ -164,8 +165,10 @@ function HomeContent() {
               </div>
               <button
                 onClick={() => {
-                  const tagline = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-                  setConfettiMessage({ type: "tagline", tagline, city: displayLocation.city });
+                  const config = getConfettiConfig(hoursUntilFive);
+                  const phrases = getPhrasesForHoursUntilFive(hoursUntilFive);
+                  const tagline = phrases[Math.floor(Math.random() * phrases.length)];
+                  setConfettiMessage({ type: "tagline", tagline, city: displayLocation.city, config });
                 }}
                 className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-colors"
                 aria-label="Launch confetti"
@@ -209,11 +212,11 @@ function HomeContent() {
 
             <div className="flex items-center gap-4 pl-4">
               <MapPin aria-hidden="true" size={24} strokeWidth={1.5} className="opacity-40 shrink-0" />
-              <div className="flex flex-col gap-1">
-                <ClockTagline />
+              <div className="flex flex-col">
+                <ClockTagline key={displayLocation.city} hoursUntilFive={hoursUntilFive} />
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold tracking-tight">{displayLocation.city}</span>
-                  <span className="text-lg font-light opacity-30 -ml-0.5">{displayLocation.country}</span>
+                  <span className="text-lg font-light opacity-40 -ml-0.5">{displayLocation.country}</span>
                 </div>
               </div>
             </div>
@@ -224,10 +227,10 @@ function HomeContent() {
             {/* World Map */}
             <div className="bg-[var(--sheet-bg)] rounded-3xl p-4 md:p-5 shrink-0 transition-colors">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold tracking-widest uppercase opacity-30">
+                <span className="text-xs font-semibold tracking-widest uppercase opacity-40">
                   Time Zone
                 </span>
-                <span className="text-xs opacity-30 tabular-nums">
+                <span className="text-xs opacity-40 tabular-nums">
                   UTC {displayEntry.liveUtcOffset >= 0 ? "+" : ""}
                   {displayEntry.liveUtcOffset}
                 </span>
@@ -251,7 +254,7 @@ function HomeContent() {
 
           {/* Footer */}
           <footer className="py-6 text-center">
-            <span className="text-xs opacity-30">
+            <span className="text-xs opacity-40">
               Built by{" "}
               <a
                 href="https://www.jessedestroys.com"
@@ -262,7 +265,7 @@ function HomeContent() {
                 jessedestroys.com
               </a>
               {" "}
-              <span className="opacity-50">v1.2.0</span>
+              <span className="opacity-40">v1.2.0</span>
             </span>
           </footer>
         </div>

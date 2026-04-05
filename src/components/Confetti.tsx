@@ -39,9 +39,11 @@ const PINT_MATRIX: [number, number, number, number, number, number] = [
   -5.9016393442622945,
 ];
 
+import type { ConfettiConfig } from "@/components/ClockDisplay";
+
 export type ConfettiMessage =
   | { type: "five"; city: string }
-  | { type: "tagline"; tagline: string; city: string };
+  | { type: "tagline"; tagline: string; city: string; config?: ConfettiConfig };
 
 interface ConfettiProps {
   message: ConfettiMessage;
@@ -93,38 +95,61 @@ export default function Confetti({ message, isDark, onComplete }: ConfettiProps)
       disableForReducedMotion: true,
     };
 
-    // Fireworks style — short 3-second burst
-    const duration = 3 * 1000;
-    const animationEnd = Date.now() + duration;
+    const config: ConfettiConfig = message.type === "five"
+      ? { strength: 1.0, mode: "full", duration: 3.0 }
+      : (message.config ?? { strength: 1.0, mode: "full", duration: 3.0 });
 
     const randomInRange = (min: number, max: number) =>
       Math.random() * (max - min) + min;
 
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
+    // Tiny pop — single burst, no interval
+    if (config.mode === "pop") {
+      myConfetti({
+        ...defaults,
+        particleCount: 5,
+        origin: { x: 0.5, y: 0.4 },
+        startVelocity: 15,
+      });
+      setTimeout(() => onCompleteRef.current(), 1500);
+      return () => myConfetti.reset();
+    }
 
+    const duration = config.duration * 1000;
+    const baseParticles = 50 * config.strength;
+    const animationEnd = Date.now() + duration;
+
+    const intervalId = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
       if (timeLeft <= 0) {
-        clearInterval(interval);
-        // Let last particles settle, then signal complete
+        clearInterval(intervalId);
         setTimeout(() => onCompleteRef.current(), 1500);
         return;
       }
 
-      const particleCount = 50 * (timeLeft / duration);
-      myConfetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-      });
-      myConfetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-      });
+      const particleCount = baseParticles * (timeLeft / duration);
+
+      if (config.mode === "dual" || config.mode === "full") {
+        myConfetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        });
+        myConfetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        });
+      } else {
+        myConfetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.3, 0.7), y: Math.random() - 0.2 },
+        });
+      }
     }, 250);
 
     return () => {
-      clearInterval(interval);
+      clearInterval(intervalId);
       myConfetti.reset();
     };
   }, []);
