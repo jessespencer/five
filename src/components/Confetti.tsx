@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { getAccentForHour } from "@/utils/accentColor";
@@ -54,10 +54,17 @@ interface ConfettiProps {
 export default function Confetti({ message, isDark, onComplete }: ConfettiProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onCompleteRef = useRef(onComplete);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  const fireComplete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onCompleteRef.current();
+  }, []);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -102,33 +109,23 @@ export default function Confetti({ message, isDark, onComplete }: ConfettiProps)
     const randomInRange = (min: number, max: number) =>
       Math.random() * (max - min) + min;
 
-    // Tiny pop — single burst, no interval
-    if (config.mode === "pop") {
-      myConfetti({
-        ...defaults,
-        particleCount: 5,
-        origin: { x: 0.5, y: 0.4 },
-        startVelocity: 15,
-      });
-      setTimeout(() => onCompleteRef.current(), 1500);
-      return () => myConfetti.reset();
-    }
-
     const duration = config.duration * 1000;
     const baseParticles = 50 * config.strength;
     const animationEnd = Date.now() + duration;
 
-    const intervalId = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        clearInterval(intervalId);
-        setTimeout(() => onCompleteRef.current(), 1500);
-        return;
-      }
+    // "full" mode: sustained fireworks on an interval
+    // "single"/"dual": one-shot burst(s)
+    if (config.mode === "full") {
+      const intervalId = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(intervalId);
+          setTimeout(() => fireComplete(), 1500);
+          return;
+        }
 
-      const particleCount = baseParticles * (timeLeft / duration);
+        const particleCount = baseParticles * (timeLeft / duration);
 
-      if (config.mode === "dual" || config.mode === "full") {
         myConfetti({
           ...defaults,
           particleCount,
@@ -139,23 +136,55 @@ export default function Confetti({ message, isDark, onComplete }: ConfettiProps)
           particleCount,
           origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
         });
-      } else {
-        myConfetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.3, 0.7), y: Math.random() - 0.2 },
-        });
-      }
-    }, 250);
+      }, 250);
+
+      return () => {
+        clearInterval(intervalId);
+        myConfetti.reset();
+      };
+    }
+
+    // Single burst from center
+    if (config.mode === "single") {
+      myConfetti({
+        ...defaults,
+        particleCount: baseParticles,
+        origin: { x: randomInRange(0.3, 0.7), y: Math.random() - 0.2 },
+      });
+    }
+
+    // Dual burst from left + right
+    if (config.mode === "dual") {
+      myConfetti({
+        ...defaults,
+        particleCount: baseParticles,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      myConfetti({
+        ...defaults,
+        particleCount: baseParticles,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }
+
+    const tid = setTimeout(() => fireComplete(), duration + 1500);
 
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(tid);
       myConfetti.reset();
     };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally runs once on mount; message/isDark are captured at mount time
+  }, [fireComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
+    <div
+      className="fixed inset-0 z-50 cursor-pointer"
+      role="button"
+      aria-label="Dismiss confetti"
+      tabIndex={0}
+      onClick={fireComplete}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fireComplete(); } }}
+    >
       {/* Dim background */}
       <motion.div
         className="absolute inset-0 bg-[var(--background)]/60"

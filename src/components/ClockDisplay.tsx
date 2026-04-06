@@ -75,17 +75,18 @@ export function getPhrasesForHoursUntilFive(hoursUntil: number): string[] {
 
 export type ConfettiConfig = {
   strength: number;
-  mode: "full" | "dual" | "single" | "pop";
+  mode: "full" | "dual" | "single";
   duration: number;
 };
 
 export function getConfettiConfig(hoursUntil: number): ConfettiConfig {
   if (hoursUntil === 0) return { strength: 1.0, mode: "full", duration: 2.0 };
-  if (hoursUntil <= 2) return { strength: 0.6, mode: "single", duration: 0.7 };
-  if (hoursUntil <= 5) return { strength: 0.3, mode: "single", duration: 0.5 };
-  if (hoursUntil <= 14) return { strength: 0.05, mode: "pop", duration: 0 };
-  if (hoursUntil <= 18) return { strength: 0.5, mode: "dual", duration: 0.8 };
-  return { strength: 0.6, mode: "dual", duration: 0.9 };
+  if (hoursUntil <= 2) return { strength: 0.8, mode: "dual", duration: 0.8 };
+  if (hoursUntil <= 5) return { strength: 0.4, mode: "single", duration: 0.5 };
+  if (hoursUntil <= 12) return { strength: 0.1, mode: "single", duration: 0.4 };
+  if (hoursUntil <= 15) return { strength: 0.15, mode: "single", duration: 0.4 };
+  if (hoursUntil <= 17) return { strength: 0.4, mode: "single", duration: 0.5 };
+  return { strength: 0.8, mode: "dual", duration: 0.8 };
 }
 
 export function ClockTagline({ hoursUntilFive = 0 }: { hoursUntilFive?: number }) {

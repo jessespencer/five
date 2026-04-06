@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
-const DURATION_MS = 2000;
+const DURATION_MS = 1400;
 const START_MINUTES = 60; // 1:00 PM
 const TARGET_TOTAL_MINUTES = 300; // 5:00 PM
 
@@ -21,7 +21,6 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
   const [totalMinutes, setTotalMinutes] = useState(START_MINUTES);
   const startRef = useRef<number | null>(null);
   const doneRef = useRef(false);
-  const [counted, setCounted] = useState(false);
 
   useEffect(() => {
     function tick(timestamp: number) {
@@ -41,8 +40,7 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       } else if (!doneRef.current) {
         doneRef.current = true;
         setTotalMinutes(TARGET_TOTAL_MINUTES);
-        setCounted(true);
-        setTimeout(onComplete, 1100);
+        setTimeout(onComplete, 500);
       }
     }
 
@@ -61,7 +59,7 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       lang="en"
       className="min-h-dvh w-full bg-[var(--background)] flex flex-col items-center justify-center transition-colors duration-300"
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeInOut" }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="flex items-baseline gap-1">
         <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
