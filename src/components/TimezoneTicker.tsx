@@ -102,14 +102,16 @@ export default function TimezoneTicker({
         <AnimatePresence mode="popLayout" initial={false}>
           {allLocations.map(({ location, hours, minutes, isFiveOClock }, index) => {
             const isEffective = location.city === effectiveCity;
+            const anyFive = allLocations.some((lt) => lt.isFiveOClock);
             const isFirstFive = isFiveOClock && allLocations.findIndex((lt) => lt.isFiveOClock) === index;
             const isHighlighted = isEffective || (!previewCity && isFirstFive);
-            const isRealActive = isFiveOClock;
+            // A city counts as "active" if it's at 5 PM, or if no city is and it's the fallback (index 0)
+            const isRealActive = isFiveOClock || (!anyFive && index === 0);
             const spreadHour = 17 + (index / allLocations.length) * 24;
             const cityAccent = getAccentForHour(spreadHour, isDark);
             const prevIsRealActive =
-              index > 0 && allLocations[index - 1].isFiveOClock;
-            const showUpNext = prevIsRealActive && !isFiveOClock;
+              index > 0 && (allLocations[index - 1].isFiveOClock || (!anyFive && index - 1 === 0));
+            const showUpNext = prevIsRealActive && !isFiveOClock && (anyFive || index === 1);
             return (
               <div key={location.city}>
                 {isRealActive && (index === 0 || !allLocations[index - 1].isFiveOClock) && (
