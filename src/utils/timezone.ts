@@ -109,19 +109,29 @@ export function getFiveOClockData(): FiveOClockResult {
   }
 
   // Fallback: no city is exactly at 17:xx right now.
-  // Pick the city that most recently passed 5 PM (hour 18, lowest minutes first)
-  // so we don't jump ahead to a city that hasn't hit 5 yet.
+  // This happens during DST transitions when a UTC offset slot has no city
+  // (e.g., UTC-9 is empty when Anchorage shifts to AKDT/UTC-8).
+  // Pick the city closest to 5 PM in either direction on the 24-hour clock.
   if (!fiveMatch) {
     let bestEntry: LocationTime | null = null;
     let bestDist = Infinity;
+    let bestIsFuture = false;
+
     for (const entry of allLocations) {
-      // How many minutes ago was 17:00 in this timezone? (only consider cities past 5 PM)
-      const minsSince = (entry.hours - 17) * 60 + entry.minutes;
-      if (minsSince > 0 && minsSince < bestDist) {
-        bestDist = minsSince;
+      const cityMins = entry.hours * 60 + entry.minutes;
+      const targetMins = 17 * 60;
+      const forward = ((targetMins - cityMins) % 1440 + 1440) % 1440;
+      const backward = 1440 - forward;
+      const dist = Math.min(forward, backward);
+      const isFuture = forward <= backward;
+
+      if (dist < bestDist || (dist === bestDist && isFuture && !bestIsFuture)) {
+        bestDist = dist;
         bestEntry = entry;
+        bestIsFuture = isFuture;
       }
     }
+
     fiveMatch = bestEntry ?? allLocations[0];
   }
 
