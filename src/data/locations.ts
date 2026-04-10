@@ -11,6 +11,7 @@ export const locations: Location[] = [
   { utcOffset: -12, city: "Baker Island", country: "US Minor Outlying Islands", timezone: "Etc/GMT+12", longitude: -176.5, latitude: 0.2 },
   { utcOffset: -11, city: "Pago Pago", country: "American Samoa", timezone: "Pacific/Pago_Pago", longitude: -170.7, latitude: -14.3 },
   { utcOffset: -10, city: "Honolulu", country: "United States", timezone: "Pacific/Honolulu", longitude: -157.8, latitude: 21.3 },
+  { utcOffset: -9, city: "Gambier Islands", country: "French Polynesia", timezone: "Pacific/Gambier", longitude: -135.0, latitude: -23.1 },
   { utcOffset: -9, city: "Anchorage", country: "United States", timezone: "America/Anchorage", longitude: -149.9, latitude: 61.2 },
   { utcOffset: -8, city: "Los Angeles", country: "United States", timezone: "America/Los_Angeles", longitude: -118.2, latitude: 34.1 },
   { utcOffset: -7, city: "Denver", country: "United States", timezone: "America/Denver", longitude: -104.9, latitude: 39.7 },

@@ -21,6 +21,7 @@ function HomeContent() {
   const [confettiMessage, setConfettiMessage] = useState<ConfettiMessage | null>(null);
   const [loadingDone, setLoadingDone] = useState(false);
   const prevActiveCityRef = useRef<string | null>(null);
+  const prevIsFallbackRef = useRef(true);
   const { result } = useFiveOClock();
 
   useEffect(() => {
@@ -59,14 +60,20 @@ function HomeContent() {
     }
   }, [result?.location.city, previewCity]);
 
-  // Fire confetti when the active city changes (real 5 PM transition, not preview)
+  // Fire confetti when the active city changes OR when a fallback city becomes the real 5 PM city
   useEffect(() => {
     const city = result?.location.city ?? null;
-    if (prevActiveCityRef.current && city && city !== prevActiveCityRef.current) {
-      setConfettiMessage({ type: "five", city });
+    const isFallback = result?.isFallback ?? true;
+    if (prevActiveCityRef.current && city) {
+      const cityChanged = city !== prevActiveCityRef.current;
+      const becameReal = !isFallback && prevIsFallbackRef.current;
+      if (cityChanged || becameReal) {
+        setConfettiMessage({ type: "five", city });
+      }
     }
     prevActiveCityRef.current = city;
-  }, [result?.location.city]);
+    prevIsFallbackRef.current = isFallback;
+  }, [result?.location.city, result?.isFallback]);
 
   const handleCityClick = useCallback((city: string) => {
     setPreviewCity((prev) => (prev === city ? null : city));

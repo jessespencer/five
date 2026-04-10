@@ -87,6 +87,31 @@ export const drinks: Record<string, Drink> = {
     },
     isAlcoholic: true,
   },
+  "Gambier Islands": {
+    name: "Hinano Rum Punch",
+    city: "Gambier Islands",
+    type: "cocktail",
+    tagline: "Drink like a local",
+    description: "A laid-back Polynesian punch inspired by the remote Gambier archipelago, blending tropical fruit with French flair.",
+    recipe: {
+      ingredients: [
+        { amount: "2 oz", item: "Aged rum" },
+        { amount: "1 oz", item: "Passion fruit juice" },
+        { amount: "0.5 oz", item: "Vanilla syrup" },
+        { amount: "0.5 oz", item: "Lime juice" },
+        { amount: "2 oz", item: "Pineapple juice" },
+      ],
+      instructions: [
+        "Combine all ingredients in a shaker with ice.",
+        "Shake well until chilled.",
+        "Strain into a tall glass over fresh ice.",
+        "Float a splash of dark rum on top if desired.",
+      ],
+      glass: "Tall glass",
+      garnish: "Pineapple wedge and vanilla bean",
+    },
+    isAlcoholic: true,
+  },
   "Anchorage": {
     name: "Smoked Salmon Bloody Mary",
     city: "Anchorage",

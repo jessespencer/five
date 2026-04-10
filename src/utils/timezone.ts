@@ -17,6 +17,7 @@ export interface FiveOClockResult {
   minutes: number;
   seconds: number;
   allLocations: LocationTime[];
+  isFallback: boolean;
 }
 
 function getCurrentTimeInZone(
@@ -149,5 +150,7 @@ export function getFiveOClockData(): FiveOClockResult {
     return distA - distB;
   });
 
-  return { location, drink, hours, minutes, seconds, allLocations: sorted };
+  const isFallback = !allLocations.some((lt) => lt.isFiveOClock);
+
+  return { location, drink, hours, minutes, seconds, allLocations: sorted, isFallback };
 }

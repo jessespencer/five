@@ -104,14 +104,15 @@ export default function TimezoneTicker({
             const isEffective = location.city === effectiveCity;
             const anyFive = allLocations.some((lt) => lt.isFiveOClock);
             const isFirstFive = isFiveOClock && allLocations.findIndex((lt) => lt.isFiveOClock) === index;
-            const isHighlighted = isEffective || (!previewCity && isFirstFive);
-            // A city counts as "active" if it's at 5 PM, or if no city is and it's the fallback (index 0)
-            const isRealActive = isFiveOClock || (!anyFive && index === 0);
+            const isHighlighted = isEffective || (!previewCity && (isFirstFive || (!anyFive && index === 0)));
+            const isRealActive = isFiveOClock;
             const spreadHour = 17 + (index / allLocations.length) * 24;
             const cityAccent = getAccentForHour(spreadHour, isDark);
             const prevIsRealActive =
-              index > 0 && (allLocations[index - 1].isFiveOClock || (!anyFive && index - 1 === 0));
-            const showUpNext = prevIsRealActive && !isFiveOClock && (anyFive || index === 1);
+              index > 0 && allLocations[index - 1].isFiveOClock;
+            const showUpNext = prevIsRealActive && !isFiveOClock;
+            // During fallback (no city at 5 PM), show "Up Next" after the fallback city
+            const showFallbackUpNext = !anyFive && index === 1;
             return (
               <div key={location.city}>
                 {isRealActive && (index === 0 || !allLocations[index - 1].isFiveOClock) && (
@@ -119,7 +120,12 @@ export default function TimezoneTicker({
                     Now
                   </span>
                 )}
-                {showUpNext && (
+                {!anyFive && index === 0 && (
+                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
+                    Almost Five
+                  </span>
+                )}
+                {(showUpNext || showFallbackUpNext) && (
                   <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mt-4 mb-3">
                     Up Next
                   </span>
