@@ -62,6 +62,14 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="flex items-baseline gap-1">
+        {!is24h && (
+          <span
+            aria-hidden="true"
+            className="invisible text-[24px] xl:text-[30px] leading-none font-light tracking-tight mr-2"
+          >
+            PM
+          </span>
+        )}
         <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
           {hh}:{mm}
         </span>

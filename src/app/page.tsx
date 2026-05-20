@@ -17,6 +17,7 @@ import LoadingClock from "@/components/LoadingClock";
 function HomeContent() {
   const [isDark, setIsDark] = useState(false);
   const [is24h, setIs24h] = useState(false);
+  const [is24hReady, setIs24hReady] = useState(false);
   const [previewCity, setPreviewCity] = useState<string | null>(null);
   const [confettiMessage, setConfettiMessage] = useState<ConfettiMessage | null>(null);
   const [loadingDone, setLoadingDone] = useState(false);
@@ -45,6 +46,7 @@ function HomeContent() {
     } catch {
       // localStorage unavailable (private browsing)
     }
+    setIs24hReady(true);
   }, []);
 
   function toggleTheme() {
@@ -83,7 +85,7 @@ function HomeContent() {
     setLoadingDone(true);
   }, []);
 
-  const isLoading = !result || !loadingDone;
+  const isLoading = !result || !loadingDone || !is24hReady;
 
   if (isLoading) {
     return (
