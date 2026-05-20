@@ -11,6 +11,7 @@ export const locations: Location[] = [
   { utcOffset: -12, city: "Baker Island", country: "US Minor Outlying Islands", timezone: "Etc/GMT+12", longitude: -176.5, latitude: 0.2 },
   { utcOffset: -11, city: "Pago Pago", country: "American Samoa", timezone: "Pacific/Pago_Pago", longitude: -170.7, latitude: -14.3 },
   { utcOffset: -10, city: "Honolulu", country: "United States", timezone: "Pacific/Honolulu", longitude: -157.8, latitude: 21.3 },
+  { utcOffset: -9.5, city: "Taiohae", country: "French Polynesia", timezone: "Pacific/Marquesas", longitude: -140.1, latitude: -8.9 },
   { utcOffset: -9, city: "Gambier Islands", country: "French Polynesia", timezone: "Pacific/Gambier", longitude: -135.0, latitude: -23.1 },
   { utcOffset: -9, city: "Anchorage", country: "United States", timezone: "America/Anchorage", longitude: -149.9, latitude: 61.2 },
   { utcOffset: -8, city: "Los Angeles", country: "United States", timezone: "America/Los_Angeles", longitude: -118.2, latitude: 34.1 },
@@ -40,6 +41,10 @@ export const locations: Location[] = [
   { utcOffset: 9, city: "Tokyo", country: "Japan", timezone: "Asia/Tokyo", longitude: 139.7, latitude: 35.7 },
   { utcOffset: 9.5, city: "Adelaide", country: "Australia", timezone: "Australia/Adelaide", longitude: 138.6, latitude: -34.9 },
   { utcOffset: 10, city: "Sydney", country: "Australia", timezone: "Australia/Sydney", longitude: 151.2, latitude: -33.9 },
+  { utcOffset: 10.5, city: "Lord Howe Island", country: "Australia", timezone: "Australia/Lord_Howe", longitude: 159.1, latitude: -31.5 },
   { utcOffset: 11, city: "Noumea", country: "New Caledonia", timezone: "Pacific/Noumea", longitude: 166.5, latitude: -22.3 },
   { utcOffset: 12, city: "Auckland", country: "New Zealand", timezone: "Pacific/Auckland", longitude: 174.8, latitude: -36.8 },
+  { utcOffset: 12.75, city: "Waitangi", country: "Chatham Islands, NZ", timezone: "Pacific/Chatham", longitude: -176.5, latitude: -43.9 },
+  { utcOffset: 13, city: "Apia", country: "Samoa", timezone: "Pacific/Apia", longitude: -171.8, latitude: -13.8 },
+  { utcOffset: 14, city: "Kiritimati", country: "Kiribati", timezone: "Pacific/Kiritimati", longitude: -157.4, latitude: 1.9 },
 ];
