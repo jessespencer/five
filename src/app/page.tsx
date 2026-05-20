@@ -90,7 +90,7 @@ function HomeContent() {
   if (isLoading) {
     return (
       <AnimatePresence mode="wait">
-        <LoadingClock key="loading" is24h={is24h} onComplete={handleLoadingComplete} />
+        <LoadingClock key="loading" onComplete={handleLoadingComplete} />
       </AnimatePresence>
     );
   }

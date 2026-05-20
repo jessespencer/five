@@ -13,11 +13,10 @@ function easeOutExpo(t: number, b: number, c: number, d: number): number {
 }
 
 interface LoadingClockProps {
-  is24h: boolean;
   onComplete: () => void;
 }
 
-export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
+export default function LoadingClock({ onComplete }: LoadingClockProps) {
   const [totalMinutes, setTotalMinutes] = useState(START_MINUTES);
   const startRef = useRef<number | null>(null);
   const doneRef = useRef(false);
@@ -50,8 +49,8 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  const displayHours = is24h ? hours + 12 : hours || 12;
-  const hh = displayHours.toString().padStart(2, "0");
+  const displayHours = hours || 12;
+  const hh = displayHours.toString();
   const mm = minutes.toString().padStart(2, "0");
 
   return (
@@ -61,23 +60,10 @@ export default function LoadingClock({ is24h, onComplete }: LoadingClockProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <div className="flex items-baseline gap-1">
-        {!is24h && (
-          <span
-            aria-hidden="true"
-            className="invisible text-[24px] xl:text-[30px] leading-none font-light tracking-tight mr-2"
-          >
-            PM
-          </span>
-        )}
+      <div className="flex items-baseline justify-center">
         <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
           {hh}:{mm}
         </span>
-        {!is24h && (
-          <span className="text-[24px] xl:text-[30px] leading-none font-light tracking-tight opacity-40 ml-2">
-            PM
-          </span>
-        )}
       </div>
       <motion.p
         initial={{ y: 10, opacity: 0 }}
