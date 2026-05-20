@@ -273,6 +273,30 @@ export const drinks: Record<string, Drink> = {
     },
     isAlcoholic: true,
   },
+  "St. John's": {
+    name: "Screech-In Shot",
+    city: "St. John's",
+    type: "spirit",
+    tagline: "Drink like a local",
+    description: "Newfoundland's dark rum, downed as part of the famous 'Screech-In' ceremony — kiss a cod, recite the oath, become an honorary Newfoundlander.",
+    recipe: {
+      ingredients: [
+        { amount: "1.5 oz", item: "Newfoundland Screech rum" },
+        { amount: "1", item: "Dried or frozen cod (for the kiss)" },
+        { amount: "1", item: "Sou'wester hat (optional but recommended)" },
+      ],
+      instructions: [
+        "Pour Screech into a shot glass.",
+        "When asked 'Is ye a Newfoundlander?', reply: 'Indeed I is, me ol' cock! And long may yer big jib draw!'",
+        "Kiss the cod squarely on the lips.",
+        "Down the Screech in one go.",
+        "You are now an honorary Newfoundlander.",
+      ],
+      glass: "Shot glass",
+      garnish: "A cod, a hat, and a hearty 'Yes b'y!'",
+    },
+    isAlcoholic: true,
+  },
   "Buenos Aires": {
     name: "Fernet con Coca",
     city: "Buenos Aires",
