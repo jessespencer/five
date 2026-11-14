@@ -266,12 +266,12 @@ function HomeContent() {
             <span className="text-xs opacity-40">
               Built by{" "}
               <a
-                href="https://www.jessedestroys.com"
+                href="https://jessespencer.dev"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:opacity-60 transition-opacity"
               >
-                jessedestroys.com
+                jessespencer.dev
               </a>
               {" "}
               <span className="opacity-40">v1.2.0</span>
