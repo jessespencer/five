@@ -338,8 +338,12 @@ function HomeContent() {
                 className="group self-start md:self-auto shrink-0 md:mb-[2px] inline-flex items-center gap-3 h-12 pl-5 pr-2 rounded-full transition-[background-color,transform] duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--foreground)]"
                 style={{ backgroundColor: accent, color: accentTextColor }}
               >
-                <span className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] opacity-75 translate-y-[0.5px]">Pour</span>
-                <span className="text-[16px] font-medium tracking-[-0.02em] whitespace-nowrap">{displayDrink.name}</span>
+                {/* Label and name share a baseline — centering the all-caps label's
+                    line box leaves it optically high (no descenders to balance). */}
+                <span className="inline-flex items-baseline gap-3">
+                  <span className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] opacity-75">Pour</span>
+                  <span className="text-[16px] font-medium tracking-[-0.02em] whitespace-nowrap">{displayDrink.name}</span>
+                </span>
                 {/* 32px disc inset 8px on every side, so it's concentric with the pill's end cap. */}
                 <span
                   aria-hidden="true"
