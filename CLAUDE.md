@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Stack:** Next.js 16 (App Router) + React 19 + Tailwind CSS v4 + Framer Motion + canvas-confetti + Lucide icons. Static export deployed to GitHub Pages via `output: "export"` in `next.config.ts`.
 
 **Core data flow:**
-- `src/utils/timezone.ts` — `getFiveOClockData()` is the central function. Runs every second via the `useFiveOClock` hook. Uses `Intl.DateTimeFormat` to compute the current time in each timezone, finds the one at 5 PM (or closest), and sorts all locations in continuous westward progression from the active city.
+- `src/utils/timezone.ts` — `getFiveOClockData()` is the central function. Runs every second via the `useFiveOClock` hook. Uses `Intl.DateTimeFormat` to compute the current time in each timezone, finds the one at 5 PM (the one that turned five most recently when several share the 17:xx hour; otherwise the closest), and sorts the list with every 5 PM city first, then the rest in continuous westward progression from the active city.
 - `src/hooks/useFiveOClock.ts` — Client-side hook that polls `getFiveOClockData()` at 1-second intervals.
 - `src/data/locations.ts` — Static array of ~31 locations (one per UTC offset, including half/quarter offsets like UTC+5:45 Kathmandu). Each has coordinates for map placement.
 - `src/data/drinks.ts` — `Record<string, Drink>` keyed by city name. Each drink has a full recipe. A fallback "Local Brew" drink exists in `timezone.ts` for cities without an entry.

@@ -104,7 +104,11 @@ export function getFiveOClockData(): FiveOClockResult {
     const isFiveOClock = hours === 17;
     const entry: LocationTime = { location, hours, minutes, seconds, isFiveOClock, liveUtcOffset };
     allLocations.push(entry);
-    if (isFiveOClock && !fiveMatch) {
+    // When several cities are in the 17:xx hour, the active one is whichever
+    // turned five most recently (fewest minutes past). Data order breaks ties.
+    // Don't rely on data order alone: it runs UTC−12 → +14, which is not
+    // west-to-east across the date line (e.g. Chatham +13:45 vs Honolulu −10).
+    if (isFiveOClock && (!fiveMatch || minutes < fiveMatch.minutes)) {
       fiveMatch = entry;
     }
   }
@@ -142,12 +146,21 @@ export function getFiveOClockData(): FiveOClockResult {
   // Sort by continuous westward progression from the active city.
   // Each next city is ~1 hour behind, wrapping through midnight.
   // This gives a smooth, unbroken time sequence down the list.
+  //
+  // Several cities can share the 17:xx hour when their offsets differ by less
+  // than an hour (e.g. Adelaide +10:30 at 5:27 and Sydney +11 at 5:57). The
+  // active city is the westernmost of them (it turned five most recently), so a
+  // pure westward sort would wrap the others to the very bottom of the list.
+  // Instead, every five-o'clock city leads the list — the active one first, then
+  // the rest eastward (freshest to oldest) — followed by everyone else westward.
   const fiveOffset = fiveMatch!.liveUtcOffset;
+  const westOf = (lt: LocationTime) => ((fiveOffset - lt.liveUtcOffset) % 24 + 24) % 24;
+  const eastOf = (lt: LocationTime) => ((lt.liveUtcOffset - fiveOffset) % 24 + 24) % 24;
 
   const sorted = [...allLocations].sort((a, b) => {
-    const distA = ((fiveOffset - a.liveUtcOffset) % 24 + 24) % 24;
-    const distB = ((fiveOffset - b.liveUtcOffset) % 24 + 24) % 24;
-    return distA - distB;
+    if (a.isFiveOClock !== b.isFiveOClock) return a.isFiveOClock ? -1 : 1;
+    if (a.isFiveOClock) return eastOf(a) - eastOf(b);
+    return westOf(a) - westOf(b);
   });
 
   const isFallback = !allLocations.some((lt) => lt.isFiveOClock);
