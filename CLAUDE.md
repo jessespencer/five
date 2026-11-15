@@ -69,5 +69,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - All components are `"use client"` — this is a fully client-rendered app
 - Fonts: Geist (UI + clock, weight 200 for the clock) and Geist Mono (labels, times, amounts), both via `next/font/google`
 - Drink entries are keyed by city name and must match `locations.ts` city names exactly
-- Version displayed in footer, tracked in `package.json`
+- Version displayed in footer comes from `package.json` (exposed as `NEXT_PUBLIC_APP_VERSION` in `next.config.ts`) — bump it with `npm version <x.y.z> --no-git-tag-version`
 - 3 pre-existing lint warnings (`setState-in-effect`) for localStorage hydration and interval polling — these are intentional patterns
