@@ -8,7 +8,7 @@ A real-time web app that tracks which timezone is at 5 PM and serves up a signat
 
 - Real-time clock showing the current 5 o'clock city
 - Interactive world map highlighting the active timezone
-- Sidebar ticker of all 31 timezones with smooth index-based color gradient
+- Sidebar ticker of 46 cities covering every UTC offset in use (DST aware), with a smooth index-based color gradient
 - Signature drink recipe for each city with copy/share support
 - Click any city in the sidebar to preview its time, drink, and map position
 - 12h/24h clock format toggle (persisted)
