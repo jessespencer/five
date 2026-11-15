@@ -409,7 +409,7 @@ function HomeContent() {
 
           {/* Footer */}
           <footer className="mt-[clamp(56px,11vh,112px)] mb-8 pt-3 border-t border-[var(--rule)] flex items-baseline justify-between">
-            <span className="label">Five&ensp;v1.2.0</span>
+            <span className="label">Five&ensp;v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
             <a
               href="https://jessespencer.dev"
               target="_blank"
