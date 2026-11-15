@@ -208,15 +208,15 @@ export default function Confetti({ message, isDark, onComplete }: ConfettiProps)
           transition={{ duration: 0.25, ease: "easeInOut" }}
         >
           {message.type === "five" ? (
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight">
-              It&apos;s <span className="font-black">Five</span> in {message.city}
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-light tracking-[-0.04em]">
+              It&apos;s <span className="font-medium">Five</span> in {message.city}
             </h2>
           ) : (
             <>
-              <p className="text-lg md:text-xl lg:text-2xl font-light tracking-tight opacity-60 mb-2">
+              <p className="label !text-[12px] mb-4">
                 {message.tagline}
               </p>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight">
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-[-0.04em]">
                 {message.city}
               </h2>
             </>

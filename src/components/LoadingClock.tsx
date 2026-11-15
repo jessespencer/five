@@ -61,7 +61,7 @@ export default function LoadingClock({ onComplete }: LoadingClockProps) {
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="flex items-baseline justify-center">
-        <span className="text-[96px] xl:text-[120px] leading-none font-thin tracking-tighter tabular-nums">
+        <span className="text-[clamp(104px,21vw,240px)] leading-[0.82] font-extralight tracking-[-0.06em] tabular-nums">
           {hh}:{mm}
         </span>
       </div>
@@ -69,9 +69,9 @@ export default function LoadingClock({ onComplete }: LoadingClockProps) {
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-2xl font-light tracking-tight mt-4"
+        className="label mt-8"
       >
-        It&apos;s <span className="font-black">Five</span> o&apos;clock somewhere...
+        It&apos;s five o&apos;clock somewhere
       </motion.p>
     </motion.div>
   );

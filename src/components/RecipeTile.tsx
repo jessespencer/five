@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Wine, ChevronDown, Share2, Copy, Check } from "lucide-react";
+import { useState, useCallback, useId } from "react";
+import { Plus, Share2, Copy, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Drink } from "@/data/drinks";
 
@@ -27,17 +27,37 @@ interface RecipeTileProps {
   drink: Drink;
   accentColor: string;
   accentTextColor: "#000" | "#fff";
+  /** Controlled open state, so the page can open the tile when jumping to it. */
+  isExpanded: boolean;
+  onExpandedChange: (expanded: boolean) => void;
+  /** Ref to the header button, so focus can follow a jump. */
+  toggleRef?: React.Ref<HTMLButtonElement>;
+  /** Fires once the open animation settles (layout has its final height). */
+  onOpened?: () => void;
 }
 
-export default function RecipeTile({ drink, accentColor, accentTextColor }: RecipeTileProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+export default function RecipeTile({
+  drink,
+  accentColor,
+  accentTextColor,
+  isExpanded,
+  onExpandedChange,
+  toggleRef,
+  onOpened,
+}: RecipeTileProps) {
+  const setIsExpanded = onExpandedChange;
   const [copied, setCopied] = useState(false);
+  const contentId = useId();
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await navigator.clipboard.writeText(formatDrinkAsText(drink));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(formatDrinkAsText(drink));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard can be blocked (permissions, insecure context); fail silently.
+    }
   }, [drink]);
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
@@ -52,127 +72,116 @@ export default function RecipeTile({ drink, accentColor, accentTextColor }: Reci
     }
   }, [drink]);
 
+  const onAccent = accentTextColor === "#fff";
+  const hairline = onAccent ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.16)";
+  // Same control language as the header: solid tonal fill, no hairline border.
+  const tonal = onAccent
+    ? "bg-white/[0.18] hover:bg-white/[0.26] active:bg-white/[0.32]"
+    : "bg-black/[0.10] hover:bg-black/[0.16] active:bg-black/[0.22]";
+  const pill = `h-9 pl-3 pr-3.5 flex items-center gap-2 rounded-full font-mono text-[11px] font-medium leading-none uppercase tracking-[0.08em] transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-current [&>svg]:block ${tonal}`;
+
   return (
     <motion.div
-      role="button"
-      tabIndex={0}
-      aria-expanded={isExpanded}
-      aria-label={`${drink.name} recipe — ${isExpanded ? "collapse" : "expand"}`}
-      className="rounded-3xl overflow-hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--foreground)]"
+      className="rounded-[20px] overflow-hidden transition-colors duration-500"
       style={{ backgroundColor: accentColor, color: accentTextColor }}
-      onClick={() => setIsExpanded(!isExpanded)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsExpanded(!isExpanded); } }}
     >
-      {/* Header — always visible */}
-      <div className="flex items-center justify-between pl-4 pr-5 py-4">
-        <div className="flex items-center gap-4 min-w-0">
-          <Wine aria-hidden="true" size={24} strokeWidth={1.5} className="shrink-0 opacity-75" />
-          <div className="min-w-0">
-            <p className="text-xs tracking-wide opacity-75">{drink.tagline}</p>
-            <h3 className="text-lg font-bold tracking-tight truncate">
-              {drink.name}
-            </h3>
-          </div>
-        </div>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="opacity-60 shrink-0 ml-3"
+      {/* Header — a real button (not a role=button wrapper) so the copy/share
+          controls below are not nested inside an interactive element. */}
+      <button
+        ref={toggleRef}
+        type="button"
+        aria-expanded={isExpanded}
+        aria-controls={contentId}
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="group relative w-full block pl-6 md:pl-8 pr-16 md:pr-20 pt-6 md:pt-7 pb-6 md:pb-7 text-left cursor-pointer outline-none"
+      >
+        <p className="font-mono text-[11px] leading-[16px] uppercase tracking-[0.12em] opacity-75">{drink.tagline}</p>
+        <h3 className="mt-3 md:mt-4 text-[clamp(30px,4.6vw,48px)] font-medium leading-[0.95] tracking-[-0.04em]">
+          {drink.name}
+        </h3>
+        {/* Pinned to the corner with equal top/right inset, and vertically centered
+            on the label row (label center = padding-top + 8px; disc is 36px). */}
+        <motion.span
+          aria-hidden="true"
+          animate={{ rotate: isExpanded ? 45 : 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className={`absolute top-[14px] right-[14px] md:top-[18px] md:right-[18px] w-9 h-9 rounded-full grid place-items-center transition-colors group-focus-visible:ring-2 group-focus-visible:ring-current ${onAccent ? "bg-white/[0.18] group-hover:bg-white/[0.26]" : "bg-black/[0.10] group-hover:bg-black/[0.16]"}`}
         >
-          <ChevronDown aria-hidden="true" size={20} />
-        </motion.div>
-      </div>
+          <Plus size={16} strokeWidth={1.75} absoluteStrokeWidth className="block" />
+        </motion.span>
+      </button>
 
       {/* Expanded content */}
       <AnimatePresence initial={false}>
         {isExpanded && (
           <motion.div
+            id={contentId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
+            onAnimationComplete={() => { if (isExpanded) onOpened?.(); }}
             className="overflow-hidden"
           >
-            <div className="px-14 pb-6">
-              <p className="text-sm leading-relaxed opacity-75 mb-1">
-                {drink.description}
-              </p>
-              <p className="text-xs opacity-60 mb-5 capitalize">
-                {drink.type}
-                {!drink.isAlcoholic && " \u00B7 Non-alcoholic"}
-              </p>
-
-              {/* Ingredients */}
-              <h4 className="text-[10px] font-semibold tracking-widest uppercase opacity-60 mb-3">
-                Ingredients
-              </h4>
-              <div className="mb-5">
-                {drink.recipe.ingredients.map((ing, i) => (
-                  <div
-                    key={i}
-                    className="flex items-baseline justify-between py-2 last:border-0"
-                    style={{ borderBottomWidth: "1px", borderColor: accentTextColor === "#fff" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)" }}
-                  >
-                    <span className="text-sm">{ing.item}</span>
-                    <span className="text-xs opacity-70 ml-3 whitespace-nowrap tabular-nums">
-                      {ing.amount}
-                    </span>
-                  </div>
-                ))}
+            <div className="px-6 md:px-8 pb-7 md:pb-8">
+              <div className="pt-5 border-t" style={{ borderColor: hairline }}>
+                <p className="text-[15px] leading-relaxed max-w-[58ch] opacity-90">{drink.description}</p>
+                <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.12em] opacity-75">
+                  {drink.type}
+                  {!drink.isAlcoholic && " · Non-alcoholic"}
+                  {" · "}
+                  {drink.recipe.glass}
+                </p>
               </div>
 
-              {/* Method */}
-              <h4 className="text-[10px] font-semibold tracking-widest uppercase opacity-60 mb-3">
-                Method
-              </h4>
-              <div className="mb-4">
-                {drink.recipe.instructions.map((step, i) => (
-                  <div key={i} className="flex gap-3 mb-2.5">
-                    <span className="text-xs font-bold opacity-50 w-4 shrink-0 tabular-nums">
-                      {i + 1}
-                    </span>
-                    <p className="text-sm leading-relaxed">{step}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Details */}
-              <div
-                className="flex gap-6 pt-3"
-                style={{ borderTopWidth: "1px", borderColor: accentTextColor === "#fff" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)" }}
-              >
+              <div className="mt-8 grid gap-8 md:gap-10 md:grid-cols-[5fr_7fr]">
+                {/* Ingredients */}
                 <div>
-                  <span className="text-[10px] font-semibold tracking-widest uppercase opacity-60">
-                    Glass
-                  </span>
-                  <p className="text-xs mt-0.5">{drink.recipe.glass}</p>
+                  <h4 className="font-mono text-[11px] uppercase tracking-[0.12em] opacity-75 mb-2">Ingredients</h4>
+                  <ul>
+                    {drink.recipe.ingredients.map((ing, i) => (
+                      <li
+                        key={i}
+                        className="flex items-baseline justify-between gap-4 py-2.5 border-b last:border-b-0"
+                        style={{ borderColor: hairline }}
+                      >
+                        <span className="text-[15px]">{ing.item}</span>
+                        <span className="font-mono text-[12px] whitespace-nowrap opacity-80">{ing.amount}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {drink.recipe.garnish !== "None" && (
+                    <p className="mt-4 text-[13px] opacity-80">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.12em] opacity-90 mr-2">Garnish</span>
+                      {drink.recipe.garnish}
+                    </p>
+                  )}
                 </div>
-                {drink.recipe.garnish !== "None" && (
-                  <div>
-                    <span className="text-[10px] font-semibold tracking-widest uppercase opacity-60">
-                      Garnish
-                    </span>
-                    <p className="text-xs mt-0.5">{drink.recipe.garnish}</p>
-                  </div>
-                )}
+
+                {/* Method */}
+                <div>
+                  <h4 className="font-mono text-[11px] uppercase tracking-[0.12em] opacity-75 mb-2">Method</h4>
+                  <ol>
+                    {drink.recipe.instructions.map((step, i) => (
+                      <li key={i} className="flex gap-4 py-2.5">
+                        <span className="font-mono text-[12px] leading-[1.6] opacity-70 shrink-0">
+                          {(i + 1).toString().padStart(2, "0")}
+                        </span>
+                        <p className="text-[15px] leading-relaxed">{step}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               </div>
 
               {/* Copy / Share */}
-              <div className="flex items-center gap-2 mt-5">
-                <button
-                  onClick={handleCopy}
-                  className={`h-9 px-4 flex items-center gap-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${accentTextColor === "#fff" ? "bg-white/15 hover:bg-white/25" : "bg-black/10 hover:bg-black/20"}`}
-                  aria-label={copied ? "Copied" : "Copy recipe"}
-                >
-                  {copied ? <Check aria-hidden="true" size={16} strokeWidth={1.5} /> : <Copy aria-hidden="true" size={16} strokeWidth={1.5} />}
+              <div className="flex items-center gap-2 mt-8">
+                <button onClick={handleCopy} className={pill} aria-label={copied ? "Copied" : "Copy recipe"}>
+                  {copied ? <Check aria-hidden="true" size={15} strokeWidth={1.75} absoluteStrokeWidth /> : <Copy aria-hidden="true" size={15} strokeWidth={1.75} absoluteStrokeWidth />}
                   {copied ? "Copied" : "Copy"}
                 </button>
-                <button
-                  onClick={handleShare}
-                  className={`h-9 px-4 flex items-center gap-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${accentTextColor === "#fff" ? "bg-white/15 hover:bg-white/25" : "bg-black/10 hover:bg-black/20"}`}
-                  aria-label="Share recipe"
-                >
-                  <Share2 aria-hidden="true" size={16} strokeWidth={1.5} />
+                <button onClick={handleShare} className={pill} aria-label="Share recipe">
+                  <Share2 aria-hidden="true" size={15} strokeWidth={1.75} absoluteStrokeWidth />
                   Share
                 </button>
               </div>
