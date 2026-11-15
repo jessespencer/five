@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` — start dev server (Next.js, hot reload)
 - `npm run build` — production build (static export to `out/`)
 - `npm run lint` — ESLint
+- `npm run verify:timezones` — checks `locations.ts` against every IANA zone for a full year (offset coverage incl. DST, data integrity, and the real `getFiveOClockData()` list invariants). Needs Node 22.18+. Options: `-- --year=2027`, `-- --step=5`. Run it after touching locations, drinks or `timezone.ts`.
 - No test framework is configured yet
 
 ## Architecture
@@ -20,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Core data flow:**
 - `src/utils/timezone.ts` — `getFiveOClockData()` is the central function. Runs every second via the `useFiveOClock` hook. Uses `Intl.DateTimeFormat` to compute the current time in each timezone, finds the one at 5 PM (the one that turned five most recently when several share the 17:xx hour; otherwise the closest), and sorts the list with every 5 PM city first, then the rest in continuous westward progression from the active city.
 - `src/hooks/useFiveOClock.ts` — Client-side hook that polls `getFiveOClockData()` at 1-second intervals.
-- `src/data/locations.ts` — Static array of ~31 locations (one per UTC offset, including half/quarter offsets like UTC+5:45 Kathmandu). Each has coordinates for map placement.
+- `src/data/locations.ts` — Static array of 46 locations covering every UTC offset in use, including half/quarter offsets (UTC+5:45 Kathmandu, UTC+8:45 Eucla). Offsets whose main city observes DST also get a non-DST city (e.g. Sydney + Brisbane, London + Accra) so the offset is still covered when the main city shifts. `utcOffset` is the zone's standard (non-DST) offset. Each has coordinates for map placement.
 - `src/data/drinks.ts` — `Record<string, Drink>` keyed by city name. Each drink has a full recipe. A fallback "Local Brew" drink exists in `timezone.ts` for cities without an entry.
 
 **Accent color system:**
