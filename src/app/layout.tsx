@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const instrumentSans = Instrument_Sans({
+// One grotesque family with a real light axis for the clock, plus its mono
+// for instrument-style labels and numerals.
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-instrument",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-geist",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -20,9 +26,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F3F2EE" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E0E0D" },
+  ],
 };
 
 export default function RootLayout({
@@ -39,7 +46,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${instrumentSans.variable} antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

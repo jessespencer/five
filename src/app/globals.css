@@ -3,24 +3,31 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --font-sans: var(--font-instrument);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
 }
 
 button {
   cursor: pointer;
 }
 
+/* Warm off-white / near-black, after Braun's product palette.
+   The accent (set per city on <main>) is the only saturated color. */
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
-  --sheet-bg: #F2F2F2;
+  --background: #F3F2EE;
+  --foreground: #161615;
+  --sheet-bg: #E9E7E1;
+  --rule: rgba(22, 22, 21, 0.12);
+  --muted: rgba(22, 22, 21, 0.62);
   --handle: #C0C0C0;
 }
 
 .dark {
-  --background: #0A0A0A;
-  --foreground: #ffffff;
-  --sheet-bg: #161616;
+  --background: #0E0E0D;
+  --foreground: #ECEAE4;
+  --sheet-bg: #181816;
+  --rule: rgba(236, 234, 228, 0.12);
+  --muted: rgba(236, 234, 228, 0.62);
   --handle: #444444;
 }
 
@@ -32,6 +39,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
@@ -41,6 +49,22 @@ body {
 ::selection {
   background: var(--foreground);
   color: var(--background);
+}
+
+/* Instrument-panel label: small mono caps, tracked, muted. */
+@utility label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Gentle downward nudge for the jump-to-drink arrow (stilled by reduced motion below). */
+@keyframes nudge {
+  0%, 55%, 100% { transform: translateY(0); }
+  25% { transform: translateY(3px); }
 }
 
 /* Hide scrollbars but keep scrolling */

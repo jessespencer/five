@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Sun, Moon, MapPin, ArrowLeft, PartyPopper } from "lucide-react";
+import { Sun, Moon, ArrowLeft, ArrowDown, PartyPopper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFiveOClock } from "@/hooks/useFiveOClock";
 import { getAccentForHour, getTextColorForAccent } from "@/utils/accentColor";
@@ -14,6 +14,77 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Confetti, { type ConfettiMessage } from "@/components/Confetti";
 import LoadingClock from "@/components/LoadingClock";
 
+function formatUtcOffset(offset: number): string {
+  const sign = offset < 0 ? "−" : "+";
+  const abs = Math.abs(offset);
+  const h = Math.floor(abs);
+  const m = Math.round((abs - h) * 60);
+  return `UTC${sign}${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+}
+
+function formatCoord(value: number, pos: string, neg: string): string {
+  return `${Math.abs(value).toFixed(2)}°${value >= 0 ? pos : neg}`;
+}
+
+function Wordmark() {
+  return (
+    <span className="inline-flex items-baseline gap-[3px] text-[17px] font-semibold tracking-[-0.02em] leading-none">
+      Five
+      <span aria-hidden="true" className="block w-[6px] h-[6px] rounded-full bg-[var(--accent)] transition-colors duration-500" />
+    </span>
+  );
+}
+
+/**
+ * Shared icon-control spec: 36px solid tonal disc, 16px icon at a true 1.75px
+ * stroke (absoluteStrokeWidth keeps the weight constant at any icon size).
+ */
+const ICON_SIZE = 16;
+const ICON_STROKE = 1.75;
+const controlSurface =
+  "bg-[var(--foreground)]/[0.07] hover:bg-[var(--foreground)]/[0.13] active:bg-[var(--foreground)]/[0.18] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]";
+
+function IconButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={`w-9 h-9 grid place-items-center rounded-full ${controlSurface} [&>svg]:block`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** Numbered hairline header shared by every section — the page's only ornament. */
+function SectionRule({
+  index,
+  title,
+  children,
+}: {
+  index: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 pt-3 border-t border-[var(--rule)]">
+      <span className="label">
+        <span className="text-[var(--foreground)]">{index}</span>&emsp;{title}
+      </span>
+      {children != null && <span className="label text-right">{children}</span>}
+    </div>
+  );
+}
+
 function HomeContent() {
   const [isDark, setIsDark] = useState(false);
   const [is24h, setIs24h] = useState(false);
@@ -24,6 +95,32 @@ function HomeContent() {
   const prevActiveCityRef = useRef<string | null>(null);
   const prevIsFallbackRef = useRef(true);
   const { result } = useFiveOClock();
+  const [recipeOpen, setRecipeOpen] = useState(false);
+  const drinkSectionRef = useRef<HTMLElement>(null);
+  const recipeToggleRef = useRef<HTMLButtonElement>(null);
+
+  const pendingJumpRef = useRef(false);
+
+  const scrollToDrink = useCallback(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    drinkSectionRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }, []);
+
+  // Hero shortcut: open the recipe, glide down to it, and move focus there.
+  // While the tile is collapsed the page may be too short to bring the section
+  // to the top, so the glide is re-aimed once the tile has finished opening.
+  const jumpToDrink = useCallback(() => {
+    pendingJumpRef.current = !recipeOpen;
+    setRecipeOpen(true);
+    scrollToDrink();
+    recipeToggleRef.current?.focus({ preventScroll: true });
+  }, [recipeOpen, scrollToDrink]);
+
+  const handleRecipeOpened = useCallback(() => {
+    if (!pendingJumpRef.current) return;
+    pendingJumpRef.current = false;
+    scrollToDrink();
+  }, [scrollToDrink]);
 
   useEffect(() => {
     try {
@@ -135,78 +232,79 @@ function HomeContent() {
         Skip to content
       </a>
       {/* Main content — scrollable */}
-      <div className="flex-1 min-h-dvh lg:overflow-y-auto">
-        <div className="max-w-[1100px] mx-auto flex flex-col p-4 md:p-6 lg:p-8 gap-4 md:gap-5">
+      <div className="flex-1 min-h-dvh lg:h-dvh lg:overflow-y-auto">
+        <div className="max-w-[1040px] mx-auto px-5 md:px-10 lg:px-14 pt-5 md:pt-8 flex flex-col">
           {/* Header */}
-          <header className="flex items-center justify-between shrink-0">
+          <header className="flex items-center justify-between h-10">
             {previewCity ? (
               <button
                 onClick={() => setPreviewCity(null)}
-                className="flex items-center gap-1.5 text-2xl font-light tracking-tight opacity-40 hover:opacity-80 transition-opacity"
+                className="group flex items-center gap-3 -ml-1 pl-1 pr-2 h-10 rounded-full"
               >
-                <ArrowLeft aria-hidden="true" size={24} strokeWidth={1.5} /> Back to <span className="font-black">Five</span>
+                <ArrowLeft aria-hidden="true" size={ICON_SIZE} strokeWidth={ICON_STROKE} absoluteStrokeWidth className="block transition-transform group-hover:-translate-x-0.5" />
+                <Wordmark />
+                <span className="label hidden sm:inline">Back to live</span>
               </button>
             ) : (
-              <h1 className="text-2xl font-black tracking-tight">Five</h1>
+              <h1><Wordmark /></h1>
             )}
             <div className="flex items-center gap-2">
               <div
-                className="h-9 flex items-center rounded-full bg-[var(--foreground)]/5 p-1 gap-0.5"
+                className="h-9 flex items-center rounded-full bg-[var(--foreground)]/[0.07] p-1"
                 role="radiogroup"
                 aria-label="Clock format"
               >
-                <button
-                  onClick={() => { setIs24h(false); try { localStorage.setItem("five-clock-format", "12h"); } catch {} }}
-                  className={`h-7 px-2.5 rounded-full text-xs font-semibold tabular-nums transition-colors ${!is24h ? "bg-[var(--foreground)]/10" : "opacity-40 hover:opacity-70"}`}
-                  role="radio"
-                  aria-checked={!is24h}
-                >
-                  12h
-                </button>
-                <button
-                  onClick={() => { setIs24h(true); try { localStorage.setItem("five-clock-format", "24h"); } catch {} }}
-                  className={`h-7 px-2.5 rounded-full text-xs font-semibold tabular-nums transition-colors ${is24h ? "bg-[var(--foreground)]/10" : "opacity-40 hover:opacity-70"}`}
-                  role="radio"
-                  aria-checked={is24h}
-                >
-                  24h
-                </button>
+                {(["12h", "24h"] as const).map((fmt) => {
+                  const checked = (fmt === "24h") === is24h;
+                  return (
+                    <button
+                      key={fmt}
+                      onClick={() => { setIs24h(fmt === "24h"); try { localStorage.setItem("five-clock-format", fmt); } catch {} }}
+                      className={`h-7 min-w-[42px] px-2.5 grid place-items-center rounded-full font-mono text-[11px] font-medium leading-none uppercase tracking-[0.06em] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/50 ${checked ? "bg-[var(--foreground)] text-[var(--background)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+                      role="radio"
+                      aria-checked={checked}
+                    >
+                      {/* Mono caps sit high in their line box; nudge down to optical center. */}
+                      <span className="block translate-y-[0.5px]">{fmt}</span>
+                    </button>
+                  );
+                })}
               </div>
-              <button
+              <IconButton
+                label="Launch confetti"
                 onClick={() => {
                   const config = getConfettiConfig(hoursUntilFive);
                   const phrases = getPhrasesForHoursUntilFive(hoursUntilFive);
                   const tagline = phrases[Math.floor(Math.random() * phrases.length)];
                   setConfettiMessage({ type: "tagline", tagline, city: displayLocation.city, config });
                 }}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-colors"
-                aria-label="Launch confetti"
               >
-                <PartyPopper aria-hidden="true" size={16} strokeWidth={1.5} />
-              </button>
-              <button
-                onClick={toggleTheme}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-colors"
-                aria-label="Toggle dark mode"
-              >
+                {/* The popper's mass sits bottom-left; shift up-right to look centered. */}
+                <PartyPopper aria-hidden="true" size={ICON_SIZE} strokeWidth={ICON_STROKE} absoluteStrokeWidth className="translate-x-[0.75px] -translate-y-[0.75px]" />
+              </IconButton>
+              <IconButton label={isDark ? "Switch to light mode" : "Switch to dark mode"} onClick={toggleTheme}>
                 {isDark ? (
-                  <Sun aria-hidden="true" size={16} strokeWidth={1.5} />
+                  <Sun aria-hidden="true" size={ICON_SIZE} strokeWidth={ICON_STROKE} absoluteStrokeWidth />
                 ) : (
-                  <Moon aria-hidden="true" size={16} strokeWidth={1.5} />
+                  <Moon aria-hidden="true" size={ICON_SIZE} strokeWidth={ICON_STROKE} absoluteStrokeWidth />
                 )}
-              </button>
+              </IconButton>
             </div>
           </header>
 
-          {/* Clock */}
-          <div id="clock" className="shrink-0 flex flex-col gap-8">
-            <div className="overflow-hidden">
+          {/* 01 — Clock */}
+          <section id="clock" aria-label="Local time" className="pt-[clamp(32px,8vh,88px)]">
+            <SectionRule index="01" title={previewCity ? "Preview" : "Five o'clock"}>
+              {formatUtcOffset(displayEntry.liveUtcOffset)}
+            </SectionRule>
+
+            <div className="overflow-hidden pt-[clamp(28px,5vh,56px)]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={displayLocation.city}
-                  initial={{ y: -20, opacity: 0 }}
+                  initial={{ y: -16, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 20, opacity: 0 }}
+                  exit={{ y: 16, opacity: 0 }}
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                 >
                   <ClockDisplay
@@ -219,77 +317,129 @@ function HomeContent() {
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center gap-4 pl-4">
-              <MapPin aria-hidden="true" size={24} strokeWidth={1.5} className="opacity-40 shrink-0" />
-              <div className="flex flex-col">
-                <ClockTagline key={displayLocation.city} hoursUntilFive={hoursUntilFive} />
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold tracking-tight">{displayLocation.city}</span>
-                  <span className="text-lg font-light opacity-40 -ml-0.5">{displayLocation.country}</span>
-                </div>
+            {/* Location left, drink shortcut right — the button's right edge lines up
+                with the UTC label and the clock's seconds column above. Stacks on small screens. */}
+            <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-x-10 gap-y-8">
+              <div className="min-w-0">
+                <p className="text-[15px] text-[var(--muted)]">
+                  <ClockTagline key={displayLocation.city} hoursUntilFive={hoursUntilFive} />
+                </p>
+                <h2 className="mt-1 text-[clamp(36px,6vw,64px)] font-medium leading-[1] tracking-[-0.04em]">
+                  {displayLocation.city}
+                  <span className="text-[var(--muted)] font-light"> {displayLocation.country}</span>
+                </h2>
               </div>
-            </div>
-          </div>
 
-          {/* Map + Recipe */}
-          <div className="flex flex-col gap-4 md:gap-5">
-            {/* World Map */}
-            <div className="bg-[var(--sheet-bg)] rounded-3xl p-4 md:p-5 shrink-0 transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold tracking-widest uppercase opacity-40">
-                  Time Zone
+              {/* Jump to the drink — the page's one colored control, mirroring the recipe tile below. */}
+              <button
+                type="button"
+                onClick={jumpToDrink}
+                aria-label={`Show the ${displayDrink.name} recipe`}
+                className="group self-start md:self-auto shrink-0 md:mb-[2px] inline-flex items-center gap-3 h-12 pl-5 pr-2 rounded-full transition-[background-color,transform] duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--foreground)]"
+                style={{ backgroundColor: accent, color: accentTextColor }}
+              >
+                <span className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] opacity-75 translate-y-[0.5px]">Pour</span>
+                <span className="text-[16px] font-medium tracking-[-0.02em] whitespace-nowrap">{displayDrink.name}</span>
+                {/* 32px disc inset 8px on every side, so it's concentric with the pill's end cap. */}
+                <span
+                  aria-hidden="true"
+                  className="w-8 h-8 rounded-full grid place-items-center"
+                  style={{ backgroundColor: accentTextColor === "#fff" ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)" }}
+                >
+                  <ArrowDown size={ICON_SIZE} strokeWidth={ICON_STROKE} absoluteStrokeWidth className="block animate-[nudge_2.6s_ease-in-out_infinite] group-hover:[animation-play-state:paused]" />
                 </span>
-                <span className="text-xs opacity-40 tabular-nums">
-                  UTC {displayEntry.liveUtcOffset >= 0 ? "+" : ""}
-                  {displayEntry.liveUtcOffset}
-                </span>
-              </div>
+              </button>
+            </div>
+          </section>
+
+          {/* 02 — Map */}
+          <section aria-label="Time zone map" className="pt-[clamp(56px,11vh,112px)]">
+            <SectionRule index="02" title="Time zone">
+              {formatCoord(displayLocation.latitude, "N", "S")}&ensp;{formatCoord(displayLocation.longitude, "E", "W")}
+            </SectionRule>
+            <div className="pt-6 md:pt-8">
               <WorldMap
                 allLocations={result.allLocations}
                 activeCity={displayLocation.city}
                 activeLongitude={displayLocation.longitude}
               />
             </div>
+          </section>
 
-            {/* Recipe Tile */}
-            <div className="shrink-0">
+          {/* 03 — Drink */}
+          <section
+            ref={drinkSectionRef}
+            id="drink"
+            aria-label="Signature drink"
+            className="pt-[clamp(56px,11vh,112px)] scroll-mt-[-32px] md:scroll-mt-[-48px]"
+          >
+            <SectionRule index="03" title="Signature drink">
+              {displayDrink.city}
+            </SectionRule>
+            <div className="pt-6 md:pt-8">
               <RecipeTile
                 drink={displayDrink}
                 accentColor={accent}
                 accentTextColor={accentTextColor}
+                isExpanded={recipeOpen}
+                onExpandedChange={setRecipeOpen}
+                toggleRef={recipeToggleRef}
+                onOpened={handleRecipeOpened}
               />
             </div>
-          </div>
+          </section>
+
+          {/* 04 — All zones (mobile/tablet; desktop uses the sidebar) */}
+          <section aria-label="All time zones" className="lg:hidden pt-[clamp(56px,11vh,112px)]">
+            <SectionRule index="04" title="All zones">
+              {result.allLocations.length}
+            </SectionRule>
+            {/* No fixed height on small screens: the list scrolls with the page rather than in a nested scroller. */}
+            <div className="pt-4 flex flex-col">
+              <TimezoneTicker
+                allLocations={result.allLocations}
+                activeCity={result.location.city}
+                previewCity={previewCity}
+                onCityClick={handleCityClick}
+                is24h={is24h}
+                isDark={isDark}
+              />
+            </div>
+          </section>
 
           {/* Footer */}
-          <footer className="py-6 text-center">
-            <span className="text-xs opacity-40">
-              Built by{" "}
-              <a
-                href="https://jessespencer.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:opacity-60 transition-opacity"
-              >
-                jessespencer.dev
-              </a>
-              {" "}
-              <span className="opacity-40">v1.2.0</span>
-            </span>
+          <footer className="mt-[clamp(56px,11vh,112px)] mb-8 pt-3 border-t border-[var(--rule)] flex items-baseline justify-between">
+            <span className="label">Five&ensp;v1.2.0</span>
+            <a
+              href="https://jessespencer.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label hover:!text-[var(--foreground)] transition-colors"
+            >
+              jessespencer.dev ↗
+            </a>
           </footer>
         </div>
       </div>
 
       {/* Side panel — locked timezone ticker (desktop only) */}
-      <aside className="hidden lg:flex flex-col w-[260px] shrink-0 h-dvh sticky top-0 border-l border-[var(--foreground)]/5 bg-[var(--background)] p-4 pt-8 transition-colors">
-        <TimezoneTicker
-          allLocations={result.allLocations}
-          activeCity={result.location.city}
-          previewCity={previewCity}
-          onCityClick={handleCityClick}
-          is24h={is24h}
-          isDark={isDark}
-        />
+      <aside
+        aria-label="All time zones"
+        className="hidden lg:flex flex-col w-[260px] h-dvh shrink-0 sticky top-0 border-l border-[var(--rule)] bg-[var(--background)] px-5 pt-5 md:pt-8 transition-colors"
+      >
+        <div className="h-10 flex items-center">
+          <span className="label">All zones</span>
+        </div>
+        <div className="flex-1 min-h-0 pt-[clamp(32px,8vh,88px)] flex flex-col">
+          <TimezoneTicker
+            allLocations={result.allLocations}
+            activeCity={result.location.city}
+            previewCity={previewCity}
+            onCityClick={handleCityClick}
+            is24h={is24h}
+            isDark={isDark}
+          />
+        </div>
       </aside>
 
     </motion.main>

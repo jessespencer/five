@@ -14,13 +14,23 @@ interface TimezoneTickerProps {
   isDark?: boolean;
 }
 
+function formatTimeParts(h: number, m: number, is24h: boolean): { time: string; meridiem: string } {
+  const mm = m.toString().padStart(2, "0");
+  if (is24h) return { time: `${h.toString().padStart(2, "0")}:${mm}`, meridiem: "" };
+  return { time: `${h % 12 || 12}:${mm}`, meridiem: h >= 12 ? "PM" : "AM" };
+}
+
 function formatTime(h: number, m: number, is24h: boolean): string {
-  if (is24h) {
-    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
-  }
-  const displayH = h % 12 || 12;
-  const ampm = h >= 12 ? "p" : "a";
-  return `${displayH}:${m.toString().padStart(2, "0")}${ampm}`;
+  const { time, meridiem } = formatTimeParts(h, m, is24h);
+  return meridiem ? `${time} ${meridiem}` : time;
+}
+
+function GroupLabel({ children, first = false }: { children: React.ReactNode; first?: boolean }) {
+  return (
+    <span className={`label block pt-3 pb-2 border-t border-[var(--rule)] ${first ? "" : "mt-5"}`}>
+      {children}
+    </span>
+  );
 }
 
 export default function TimezoneTicker({
@@ -95,10 +105,10 @@ export default function TimezoneTicker({
       tabIndex={0}
       role="listbox"
       aria-label="Timezone list"
-      className="overflow-y-auto h-full scrollbar-hide outline-none p-1 -m-1"
+      className="overflow-y-auto flex-1 min-h-0 scrollbar-hide outline-none px-2 -mx-2 pb-8"
       style={{ scrollbarWidth: "none" }}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col">
         <AnimatePresence mode="popLayout" initial={false}>
           {allLocations.map(({ location, hours, minutes, isFiveOClock }, index) => {
             const isEffective = location.city === effectiveCity;
@@ -116,20 +126,10 @@ export default function TimezoneTicker({
             return (
               <div key={location.city}>
                 {isRealActive && (index === 0 || !allLocations[index - 1].isFiveOClock) && (
-                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
-                    Now
-                  </span>
+                  <GroupLabel first={index === 0}>Now</GroupLabel>
                 )}
-                {!anyFive && index === 0 && (
-                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mb-3">
-                    Almost Five
-                  </span>
-                )}
-                {(showUpNext || showFallbackUpNext) && (
-                  <span className="text-xs font-semibold tracking-widest uppercase opacity-30 block mt-4 mb-3">
-                    Up Next
-                  </span>
-                )}
+                {!anyFive && index === 0 && <GroupLabel first>Almost five</GroupLabel>}
+                {(showUpNext || showFallbackUpNext) && <GroupLabel>Up next</GroupLabel>}
                 <motion.div
                 ref={(el: HTMLDivElement | null) => {
                   if (el) rowRefs.current.set(location.city, el);
@@ -147,29 +147,30 @@ export default function TimezoneTicker({
                 onClick={() => onCityClick?.(location.city)}
                 onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !isEffective) { e.preventDefault(); onCityClick?.(location.city); } }}
                 className={`
-                  flex items-center justify-between gap-3 px-3 py-2 rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--foreground)]/30
-                  ${isHighlighted ? "bg-[var(--foreground)]/10" : "hover:bg-[var(--foreground)]/5"}
+                  group flex items-center justify-between gap-3 h-8 -mx-2 px-2 rounded-md transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-[var(--foreground)]/40
+                  ${isHighlighted ? "bg-[var(--foreground)]/[0.06] text-[var(--foreground)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"}
                 `}
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div
-                    className="w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{ backgroundColor: cityAccent, opacity: isHighlighted ? 1 : 0.5 }}
-                  />
+                <div className="flex items-center gap-2.5 min-w-0">
                   <span
-                    className={`text-xs truncate ${
-                      isHighlighted ? "font-semibold" : "opacity-50"
-                    }`}
-                  >
+                    aria-hidden="true"
+                    className="block w-[5px] h-[5px] rounded-full shrink-0 transition-transform"
+                    style={{ backgroundColor: cityAccent, transform: isHighlighted ? "scale(1.4)" : undefined }}
+                  />
+                  <span className={`text-[13px] tracking-[-0.005em] truncate ${isHighlighted ? "font-medium" : ""}`}>
                     {location.city}
                   </span>
                 </div>
-                <span
-                  className={`text-xs tabular-nums whitespace-nowrap ${
-                    isHighlighted ? "font-bold" : "opacity-40"
-                  }`}
-                >
-                  {formatTime(hours, minutes, is24h)}
+                <span className="font-mono text-[12px] tabular-nums whitespace-nowrap">
+                  {(() => {
+                    const { time, meridiem } = formatTimeParts(hours, minutes, is24h);
+                    return (
+                      <>
+                        {time}
+                        {meridiem && <span className="ml-1 text-[10px] opacity-70">{meridiem}</span>}
+                      </>
+                    );
+                  })()}
                 </span>
               </motion.div>
               </div>

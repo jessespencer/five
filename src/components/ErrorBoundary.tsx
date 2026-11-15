@@ -22,7 +22,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div role="alert" aria-live="assertive" className="min-h-dvh flex items-center justify-center bg-[var(--background)] text-[var(--foreground)]">
           <div className="text-center">
-            <h1 className="text-2xl font-black tracking-tight mb-2">Something went wrong</h1>
+            <h1 className="text-2xl font-bold tracking-tight mb-2">Something went wrong</h1>
             <p className="text-sm opacity-50 mb-4">The app hit an unexpected error.</p>
             <button
               onClick={() => this.setState({ hasError: false })}

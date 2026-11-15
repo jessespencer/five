@@ -40,10 +40,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `ClockDisplay.tsx` exports `PHRASES` array for reuse by the confetti tagline mode.
 
 **Components (all client-side):**
-- `ClockDisplay` — Large time display supporting 12h/24h format, `aria-live` for screen readers. Exports `PHRASES` array of taglines.
+- `ClockDisplay` — Large light-weight time display (12h/24h) with seconds in the accent color and a 60-tick seconds rule. Deliberately no `aria-live` (it ticks every second); the time is exposed via `aria-label`. Exports `PHRASES` array of taglines.
 - `WorldMap` — SVG equirectangular map with continent paths, animated timezone line, city dots. Uses `useId()` for unique SVG pattern IDs.
-- `TimezoneTicker` — Locked sidebar panel (`role="listbox"`) listing all timezones in westward order. Clickable for city preview, full keyboard navigation (Arrow keys move focus, Enter/Space select, Escape deselect).
-- `RecipeTile` — Expandable accent-colored card (`role="button"`, `aria-expanded`) showing drink name, ingredients, method, with copy/share buttons. Keyboard accessible.
+- `TimezoneTicker` — Sidebar panel on desktop, inline section on mobile (`role="listbox"`) listing all timezones in westward order. Clickable for city preview, full keyboard navigation (Arrow keys move focus, Enter/Space select, Escape deselect).
+- `RecipeTile` — Expandable accent-colored card; the header is a real `<button>` with `aria-expanded`/`aria-controls`. Open state is controlled by `page.tsx` so the hero "Pour" button can open it and scroll to it. Shows drink name, ingredients, method, with copy/share buttons. Keyboard accessible.
 - `Confetti` — Canvas-based confetti overlay with text; see "Confetti system" above.
 - `ErrorBoundary` — Class component wrapping the app; shows recovery UI with `role="alert"` on crash.
 
@@ -53,7 +53,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `five-theme` — `"dark"` or `"light"` for theme toggle
 - `five-clock-format` — `"12h"` or `"24h"` for clock format toggle
 
-**Styling:** Uses CSS custom properties (`--background`, `--foreground`, `--sheet-bg`) defined in `globals.css` with `.dark` class variants. Container border radius is `rounded-3xl`.
+**Styling:** Dieter Rams–style minimalism: warm off-white / near-black palette via CSS custom properties (`--background`, `--foreground`, `--rule`, `--muted`) in `globals.css` with `.dark` variants. The per-city `--accent` is the only saturated color. Sections are numbered hairline rows (`SectionRule` in `page.tsx`); small metadata uses the `label` utility (mono caps) defined in `globals.css`.
 
 **Deployment:** GitHub Pages via `.github/workflows/deploy.yml`. `basePath` is `/five` in production. Images are unoptimized (required for static export).
 
@@ -66,7 +66,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Conventions
 
 - All components are `"use client"` — this is a fully client-rendered app
-- Font: Instrument Sans loaded via `next/font/google`
+- Fonts: Geist (UI + clock, weight 200 for the clock) and Geist Mono (labels, times, amounts), both via `next/font/google`
 - Drink entries are keyed by city name and must match `locations.ts` city names exactly
 - Version displayed in footer, tracked in `package.json`
 - 3 pre-existing lint warnings (`setState-in-effect`) for localStorage hydration and interval polling — these are intentional patterns

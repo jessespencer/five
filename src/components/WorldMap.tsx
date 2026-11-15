@@ -59,7 +59,7 @@ export default function WorldMap({
   const lineX = lonToX(activeLongitude);
 
   return (
-    <div className="relative w-full aspect-[2/1] max-h-[280px]">
+    <div className="relative w-full aspect-[2/1] max-h-[440px]">
       <svg
         viewBox="0 0 1000 500"
         className="w-full h-full"
@@ -108,8 +108,8 @@ export default function WorldMap({
           y={0}
           width={40}
           height={500}
-          className="fill-[var(--foreground)]"
-          opacity={0.04}
+          className="fill-[var(--accent)]"
+          opacity={0.08}
           animate={{ x: lineX - 20 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         />
@@ -118,10 +118,10 @@ export default function WorldMap({
         <motion.line
           y1={0}
           y2={500}
-          className="stroke-[var(--foreground)]"
-          strokeWidth={1.5}
-          strokeDasharray="6 4"
-          animate={{ x1: lineX, x2: lineX, opacity: 0.2 }}
+          className="stroke-[var(--accent)]"
+          strokeWidth={1}
+          strokeDasharray="2 4"
+          animate={{ x1: lineX, x2: lineX, opacity: 0.9 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         />
 
@@ -172,8 +172,8 @@ export default function WorldMap({
                 x={cx}
                 y={cy - 18}
                 textAnchor="middle"
-                className="fill-[var(--foreground)] text-[13px] font-semibold"
-                opacity={0.7}
+                className="fill-[var(--foreground)] font-mono text-[13px] uppercase tracking-[0.1em]"
+                opacity={0.85}
               >
                 {location.city}
               </text>
